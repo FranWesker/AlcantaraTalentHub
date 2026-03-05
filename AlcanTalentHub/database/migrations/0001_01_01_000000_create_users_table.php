@@ -17,6 +17,9 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            // Añadimos el rol y el estado de validación
+            $table->enum('role', ['estudiante', 'empresa', 'mentor', 'admin'])->default('estudiante');
+            $table->boolean('is_validated')->default(false);
             $table->rememberToken();
             $table->timestamps();
         });

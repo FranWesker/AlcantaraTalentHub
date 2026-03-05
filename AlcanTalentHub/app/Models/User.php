@@ -21,6 +21,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
+        'is_validated',
     ];
 
     /**
@@ -43,6 +45,31 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_validated' => 'boolean',
         ];
+    }
+
+    // Relacion: Un estudiante tiene un perfil
+    public function profile()
+    {
+        return $this->hasOne(StudentProfile::class);
+    }
+
+    // Relacion: Un estudiante tiene muchas habilidades
+    public function skills(){
+        return $this->belongsToMany(Skill::class,);
+    }
+
+    //Relacion: Una empresa publica muchos proyectos
+    public function publishedProjects(){
+        return $this->hasMany(Project::class, 'company_id');
+    }
+
+    // Relacion: Un estudiante se postula a muchos proyectos
+    public function applications(){
+        return $this->belongsToMany(Project::class, 'applications', 'student_id', 'project_id')
+                    ->withPivot('status')
+                    ->withTimestamps()
+                    ->using(Application::class); // Usamos un modelo Pivot personalizado (opcional pero recomendado)
     }
 }
