@@ -4,12 +4,10 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
@@ -30,7 +28,7 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        // 1. Validamos los campos básicos y la selección virtual del formulario
+        // Validamos los campos básicos y la selección virtual del formulario
         $request->validate([
             'account_type' => ['required', 'in:student,company'],
             'name' => ['required', 'string', 'max:255'],
@@ -42,23 +40,30 @@ class RegisteredUserController extends Controller
             'linkedin_url' => ['nullable', 'url', 'max:255'],
         ]);
 
-        // 2. Creamos al usuario general en la base de datos
+        // Mapeamos lo que llega del formulario (inglés) a lo que acepta la BD (español)
+        $roleMap = [
+            'student' => 'estudiante',
+            'company' => 'empresa',
+        ];
+
+        // Creamos al usuario general en la base de datos
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'role' => $roleMap[$request->account_type], // Aquí traducimos y guardamos el rol
         ]);
 
-        // 3. LA MAGIA: Solo creamos el perfil extra si es un estudiante.
-        // Las empresas se quedan solo con su registro en la tabla 'users'.
+
+        //Solo creamos el perfil extra si es un estudiante.
         if ($request->account_type === 'student') {
-            $user->studentProfile()->create([
+            $user->profile()->create([
                 'github_url' => $request->github_url,
                 'linkedin_url' => $request->linkedin_url,
             ]);
         }
 
-        // 4. Autenticación y redirección
+        //Autenticación y redirección
         event(new \Illuminate\Auth\Events\Registered($user));
 
         Auth::login($user);
