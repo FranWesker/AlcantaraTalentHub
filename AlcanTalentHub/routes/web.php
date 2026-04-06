@@ -24,6 +24,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/projects/{project}/edit', [ProjectController::class, 'edit'])->name('projects.edit');
     Route::patch('/projects/{project}', [ProjectController::class, 'update'])->name('projects.update');
     Route::delete('/projects/{project}', [ProjectController::class, 'destroy'])->name('projects.destroy');
+
+    // Rutas para mostrar proyectos a los usuarios
+    Route::get('/proyectos', [ProjectController::class, 'index'])->name('projects.index');
+
+    // Curriculum de Alumno
+    Route::post('/profile/cv/upload', [ProfileController::class, 'uploadCv'])->name('profile.cv.upload');
 });
 
 require __DIR__.'/auth.php';

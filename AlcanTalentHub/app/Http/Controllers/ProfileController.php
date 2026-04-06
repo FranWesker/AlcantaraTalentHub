@@ -57,4 +57,31 @@ class ProfileController extends Controller
 
         return Redirect::to('/');
     }
+
+    /**
+     * Sube y actualiza el CV del estudiante.
+     */
+    public function uploadCv(\Illuminate\Http\Request $request)
+    {
+        // Validamos que el archivo sea obligatoriamente un PDF y no pese más de 2MB
+        $request->validate([
+            'cv_file' => ['required', 'file', 'mimes:pdf', 'max:2048'],
+        ]);
+
+        // Comprobamos si el usuario tiene perfil de estudiante para guardar la ruta
+        $user = auth()->user();
+
+        if ($user->profile) {
+            // Guarda el archivo en la carpeta storage/app/public/cvs
+            // Se guardará con un nombre único generado automáticamente
+            $path = $request->file('cv_file')->store('cvs', 'public');
+
+            // Aquí deberías guardar la variable $path en tu base de datos
+            // Por ejemplo: $user->profile->update(['cv_path' => $path]);
+
+            return redirect()->route('dashboard')->with('status', '¡Tu currículum se ha subido correctamente!');
+        }
+
+        return redirect()->route('dashboard')->withErrors(['cv_file' => 'No tienes un perfil de estudiante válido para subir un CV.']);
+    }
 }

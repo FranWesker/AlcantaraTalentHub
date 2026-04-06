@@ -89,4 +89,19 @@ class ProjectController extends Controller
 
         return redirect()->route('dashboard')->with('status', '¡Proyecto eliminado con éxito!');
     }
+
+    /**
+     * Muestra la lista de proyectos activos a los que un usuario se puede postular
+     * @return \Illuminate\Contracts\View\View
+     */
+    public function index(){
+        // Recuperamos todos los proyectos junto con la empresa que los creó.
+        // Filtramos solo los activos y los ordenamos por los más recientes.
+        $projects = Project::with('company')
+            ->where('is_active', true)
+            ->latest()
+            ->paginate(9); // Paginamos de 9 en 9
+
+        return view('projects.index', compact('projects'));
+    }
 }
