@@ -104,4 +104,24 @@ class ProjectController extends Controller
 
         return view('projects.index', compact('projects'));
     }
+
+    /**
+     * Verifica si el usuario que esta postulando a un proyecto tiene CV o no
+     * @param Project $project
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function apply(Project $project)
+    {
+        $user = auth()->user();
+
+        $profile = $user->profile;
+
+        // Validamos si es un estudiante y si tiene el CV subido
+        if (!$profile || empty($profile->cv_pdf_path)) {
+            // Bloqueamos la acción y redirigimos con un Flash Message de error
+            return redirect()->back()->with('error', 'Debes subir tu CV en tu perfil antes de poder postularte a un proyecto.');
+        }
+
+        return redirect()->route('projects.index')->with('success', '¡Te has postulado al proyecto con éxito!');
+    }
 }

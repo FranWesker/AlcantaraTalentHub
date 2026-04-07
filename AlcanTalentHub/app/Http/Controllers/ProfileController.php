@@ -7,6 +7,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class ProfileController extends Controller
@@ -59,29 +60,58 @@ class ProfileController extends Controller
     }
 
     /**
-     * Sube y actualiza el CV del estudiante.
+     * Sube y actualiza el CV del usuario. Si ya existe un CV, se reemplaza por el nuevo.
+     * @param Request $request
+     * @return RedirectResponse
      */
-    public function uploadCv(\Illuminate\Http\Request $request)
-    {
-        // Validamos que el archivo sea obligatoriamente un PDF y no pese más de 2MB
+    public function uploadCv(Request $request){
         $request->validate([
             'cv_file' => ['required', 'file', 'mimes:pdf', 'max:2048'],
         ]);
 
-        // Comprobamos si el usuario tiene perfil de estudiante para guardar la ruta
-        $user = auth()->user();
+        $user = $request->user();
 
-        if ($user->profile) {
-            // Guarda el archivo en la carpeta storage/app/public/cvs
-            // Se guardará con un nombre único generado automáticamente
+        $profile = $user->profile;
+
+        if ($profile) {
+            // Si ya existe un CV, lo borramos del almacenamiento local (Storage)
+            if ($profile->cv_pdf_path && Storage::disk('public')->exists($profile->cv_pdf_path)) {
+                Storage::disk('public')->delete($profile->cv_pdf_path);
+            }
+
+            // Guardamos el nuevo archivo
             $path = $request->file('cv_file')->store('cvs', 'public');
 
-            // Aquí deberías guardar la variable $path en tu base de datos
-            // Por ejemplo: $user->profile->update(['cv_path' => $path]);
+            // Actualizamos la base de datos usando el campo exacto de tu modelo StudentProfile
+            $profile->update(['cv_pdf_path' => $path]);
 
-            return redirect()->route('dashboard')->with('status', '¡Tu currículum se ha subido correctamente!');
+            return back()->with('status', 'cv-updated'); // Mensaje de éxito
         }
 
-        return redirect()->route('dashboard')->withErrors(['cv_file' => 'No tienes un perfil de estudiante válido para subir un CV.']);
+        return back()->withErrors(['cv_file' => 'No tienes un perfil de estudiante válido para subir un CV.']);
+    }
+
+    /**
+     * Summary of deleteCv
+     * @param Request $request
+     * @return RedirectResponse
+     */
+    public function deleteCv(Request $request)
+    {
+        $profile = $request->user()->profile;
+
+        if ($profile && $profile->cv_pdf_path) {
+            // Borramos el archivo físico
+            if (Storage::disk('public')->exists($profile->cv_pdf_path)) {
+                Storage::disk('public')->delete($profile->cv_pdf_path);
+            }
+
+            // Actualizamos la base de datos a null
+            $profile->update(['cv_pdf_path' => null]);
+
+            return back()->with('status', 'cv-deleted');
+        }
+
+        return back()->withErrors(['cv_file' => 'No se encontró ningún CV para eliminar.']);
     }
 }

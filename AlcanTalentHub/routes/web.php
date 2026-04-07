@@ -30,6 +30,7 @@ Route::middleware('auth')->group(function () {
 
     // Curriculum de Alumno
     Route::post('/profile/cv/upload', [ProfileController::class, 'uploadCv'])->name('profile.cv.upload');
+    Route::delete('/profile/cv/delete', [ProfileController::class, 'deleteCv'])->name('profile.cv.delete');
 });
 
 require __DIR__.'/auth.php';
