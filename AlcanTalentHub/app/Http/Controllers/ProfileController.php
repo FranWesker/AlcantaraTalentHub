@@ -114,4 +114,5 @@ class ProfileController extends Controller
 
         return back()->withErrors(['cv_file' => 'No se encontró ningún CV para eliminar.']);
     }
+
 }

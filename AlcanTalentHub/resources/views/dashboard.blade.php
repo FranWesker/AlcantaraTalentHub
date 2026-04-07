@@ -96,10 +96,35 @@
                                         <div>
                                             <div class="flex justify-between items-start">
                                                 <h3 class="text-lg font-bold text-emerald-600 dark:text-emerald-400">{{ $project->title }}</h3>
+                                                @if($project->is_active)
+                                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Activo</span>
+                                                @else
+                                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Cerrado</span>
+                                                @endif
                                             </div>
                                             <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">
                                                 {{ Str::limit($project->description, 100) }}
                                             </p>
+                                        </div>
+
+                                        <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600 flex justify-between items-center">
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">
+                                                Publicado: {{ $project->created_at->format('d/m/Y') }}
+                                            </span>
+
+                                            <div class="flex space-x-2">
+                                                <a href="{{ route('projects.edit', $project) }}" class="inline-flex items-center px-3 py-1.5 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                                    Editar
+                                                </a>
+
+                                                <form method="POST" action="{{ route('projects.destroy', $project) }}" onsubmit="return confirm('¿Estás seguro de que quieres eliminar este proyecto? Esta acción no se puede deshacer.');">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="inline-flex items-center px-3 py-1.5 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 focus:bg-red-700 active:bg-red-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                                        Eliminar
+                                                    </button>
+                                                </form>
+                                            </div>
                                         </div>
                                     </div>
                                 @empty

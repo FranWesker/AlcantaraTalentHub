@@ -70,6 +70,25 @@ class User extends Authenticatable
         return $this->belongsToMany(Project::class, 'applications', 'student_id', 'project_id')
                     ->withPivot('status')
                     ->withTimestamps()
-                    ->using(Application::class); // Usamos un modelo Pivot personalizado (opcional pero recomendado)
+                    ->using(Application::class);
+    }
+
+    public function projects()
+    {
+        // Una empresa tiene muchos proyectos creados
+        return $this->hasMany(Project::class, 'user_id');
+    }
+
+    public function isStudent()
+    {
+        // Aquí debes ajustar la lógica según cómo determines el rol de estudiante en tu aplicación
+        // Ajusta esto a la lógica real de tu base de datos
+        return $this->role === 'student';
+    }
+    public function isCompany()
+    {
+        // Aquí debes ajustar la lógica según cómo determines el rol de empresa en tu aplicación
+        // Ajusta esto a la lógica real de tu base de datos
+        return $this->role === 'company';
     }
 }

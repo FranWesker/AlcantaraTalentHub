@@ -37,16 +37,13 @@
                                         {{ $project->description }}
                                     </p>
                                 </div>
-
-                                <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
-                                    <div class="flex justify-between items-center">
-                                        <span class="text-xs text-gray-500 dark:text-gray-400">
+                                <div class="mt-4 flex justify-between items-center">
+                                    <span class="text-xs text-gray-500 dark:text-gray-400">
                                             Publicado: {{ $project->created_at->diffForHumans() }}
                                         </span>
-                                        <button class="text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 transition-colors">
-                                            Ver detalles &rarr;
-                                        </button>
-                                    </div>
+                                    <a href="{{ route('projects.show', $project) }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 rounded-md font-semibold text-xs text-white uppercase hover:bg-indigo-700">
+                                        Ver más
+                                    </a>
                                 </div>
                             </div>
                         @empty

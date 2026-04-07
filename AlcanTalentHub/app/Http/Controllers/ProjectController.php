@@ -124,4 +124,20 @@ class ProjectController extends Controller
 
         return redirect()->route('projects.index')->with('success', '¡Te has postulado al proyecto con éxito!');
     }
+    /**
+     * Summary of show
+     * @param Project $project
+     * @return \Illuminate\Contracts\View\View
+     */
+    public function show(Project $project)
+    {
+        $hasApplied = false;
+
+        // Verificamos usando tu columna 'role' y tu relación 'applications()'
+        if (auth()->check() && auth()->user()->role === 'estudiante') {
+            $hasApplied = auth()->user()->applications()->where('project_id', $project->id)->exists();
+        }
+
+        return view('projects.show', compact('project', 'hasApplied'));
+    }
 }

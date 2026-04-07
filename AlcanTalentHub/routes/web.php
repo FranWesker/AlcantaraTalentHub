@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
 use Illuminate\Support\Facades\Route;
@@ -31,6 +32,15 @@ Route::middleware('auth')->group(function () {
     // Curriculum de Alumno
     Route::post('/profile/cv/upload', [ProfileController::class, 'uploadCv'])->name('profile.cv.upload');
     Route::delete('/profile/cv/delete', [ProfileController::class, 'deleteCv'])->name('profile.cv.delete');
+
+    // Vista del proyecto por parte del estudiante
+    Route::get('/projects/{project}', [ProjectController::class, 'show'])->name('projects.show');
+    // Estudiante postula a un proyecto
+    Route::post('/projects/{project}/apply', [ApplicationController::class, 'store'])->name('applications.store');
+    // Empresa gestiona las postulaciones
+    Route::get('/company/applications', [ApplicationController::class, 'index'])->name('applications.index');
+    // Empresa acepta o rechaza una postulacion
+    Route::patch('/projects/{project}/students/{student_id}/status', [ApplicationController::class, 'updateStatus'])->name('applications.updateStatus');
 });
 
 require __DIR__.'/auth.php';
