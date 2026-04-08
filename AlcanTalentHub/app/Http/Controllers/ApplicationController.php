@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Application;
 use App\Models\Project;
+use App\Models\User;
+use App\Notifications\StudentAppliedToProject;
 use Illuminate\Http\Request;
 
 class ApplicationController extends Controller
@@ -15,19 +17,18 @@ class ApplicationController extends Controller
      * @return \Illuminate\Http\RedirectResponse
      */
     public function store(Request $request, Project $project){
-        $user = auth()->user();
+        $student = auth()->user();
 
-        if ($user->role !== 'estudiante') {
-            abort(403, 'Solo estudiantes pueden postularse.');
-        }
-
-        // Evitar postulación duplicada usando tu relación
-        if ($user->applications()->where('project_id', $project->id)->exists()) {
+        // Evitar postulación duplicada
+        if ($project->applicants()->where('student_id', $student->id)->exists()) {
             return back()->with('error', 'Ya te has postulado a este proyecto.');
         }
 
-        // Usamos attach() porque es una relación belongsToMany (Muchos a Muchos)
-        $user->applications()->attach($project->id, ['status' => 'pending']);
+        // Adjuntar al estudiante con estado 'pending'
+        $project->applicants()->attach($student->id, ['status' => 'pending']);
+
+        // Enviar la notificación a la empresa (dueña del proyecto)
+        $project->company->notify(new StudentAppliedToProject($student, $project));
 
         return back()->with('success', 'Te has postulado correctamente.');
     }
@@ -73,5 +74,22 @@ class ApplicationController extends Controller
         ]);
 
         return back()->with('success', 'Estado actualizado correctamente.');
+    }
+
+    /**
+     * Metodo para aceptar la postulacion de un estudiante
+     * @param Project $project
+     * @param User $student
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function accept(Project $project, User $student)
+    {
+        // Autorización: Asegurar que solo el dueño del proyecto pueda aceptar
+        abort_if(auth()->id() !== $project->company_id, 403, 'No estás autorizado para realizar esta acción.');
+
+        // Actualizar el estado en la tabla pivote a 'accepted'
+        $project->applicants()->updateExistingPivot($student->id, ['status' => 'accepted']);
+
+        return back()->with('success', 'Estudiante aceptado exitosamente.');
     }
 }

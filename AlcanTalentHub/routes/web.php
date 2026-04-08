@@ -41,6 +41,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/company/applications', [ApplicationController::class, 'index'])->name('applications.index');
     // Empresa acepta o rechaza una postulacion
     Route::patch('/projects/{project}/students/{student_id}/status', [ApplicationController::class, 'updateStatus'])->name('applications.updateStatus');
+    // Aceptar a un estudiante (Empresa)
+    Route::post('/projects/{project}/accept/{student}', [ApplicationController::class, 'accept'])->name('applications.accept');
 });
 
 require __DIR__.'/auth.php';

@@ -131,13 +131,25 @@ class ProjectController extends Controller
      */
     public function show(Project $project)
     {
-        $hasApplied = false;
+        $isOwner = auth()->check() && auth()->id() === $project->company_id;
 
-        // Verificamos usando tu columna 'role' y tu relación 'applications()'
-        if (auth()->check() && auth()->user()->role === 'estudiante') {
-            $hasApplied = auth()->user()->applications()->where('project_id', $project->id)->exists();
+        $pendingApplicants = collect();
+        $acceptedApplicants = collect();
+
+        // Solo cargamos los postulantes si el usuario autenticado es la empresa dueña
+        if ($isOwner) {
+            // Usamos la relación ya definida y filtramos por el status del pivot
+            $pendingApplicants = $project->applicants()
+                                         ->wherePivot('status', 'pending')
+                                         ->with('profile') // Cargamos el perfil del estudiante (para el CV)
+                                         ->get();
+
+            $acceptedApplicants = $project->applicants()
+                                          ->wherePivot('status', 'accepted')
+                                          ->with('profile')
+                                          ->get();
         }
 
-        return view('projects.show', compact('project', 'hasApplied'));
+        return view('projects.show', compact('project', 'isOwner', 'pendingApplicants', 'acceptedApplicants'));
     }
 }

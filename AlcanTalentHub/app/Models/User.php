@@ -83,12 +83,12 @@ class User extends Authenticatable
     {
         // Aquí debes ajustar la lógica según cómo determines el rol de estudiante en tu aplicación
         // Ajusta esto a la lógica real de tu base de datos
-        return $this->role === 'student';
+        return $this->role === 'estudiante';
     }
     public function isCompany()
     {
         // Aquí debes ajustar la lógica según cómo determines el rol de empresa en tu aplicación
         // Ajusta esto a la lógica real de tu base de datos
-        return $this->role === 'company';
+        return $this->role === 'empresa';
     }
 }
