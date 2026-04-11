@@ -152,4 +152,25 @@ class ProjectController extends Controller
 
         return view('projects.show', compact('project', 'isOwner', 'pendingApplicants', 'acceptedApplicants'));
     }
+
+    /**
+     * Muestra la lista de postulaciones de un proyecto en especifico, solo accesible para la empresa que lo creó
+     * al rechazar a un alumno que ha postulado deja de aparecer en la lista de alumnos postulados
+     * @param Project $project
+     * @return \Illuminate\Contracts\View\View
+     */
+    public function applicants(Project $project){
+        // Seguridad: Verificar que el proyecto pertenece a la empresa autenticada
+        if ($project->company_id !== auth()->id()) {
+            abort(403, 'No tienes permiso para ver los postulantes de este proyecto.');
+        }
+
+        // Recuperamos los postulantes, pero FILTRAMOS para que no traiga a los 'rejected'
+        $applicants = $project->applicants()
+                              ->wherePivot('status', '!=', 'rejected')
+                              ->with('profile')
+                              ->get();
+
+        return view('projects.applicants', compact('project', 'applicants'));
+    }
 }

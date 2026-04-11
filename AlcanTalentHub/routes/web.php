@@ -43,6 +43,15 @@ Route::middleware('auth')->group(function () {
     Route::patch('/projects/{project}/students/{student_id}/status', [ApplicationController::class, 'updateStatus'])->name('applications.updateStatus');
     // Aceptar a un estudiante (Empresa)
     Route::post('/projects/{project}/accept/{student}', [ApplicationController::class, 'accept'])->name('applications.accept');
+    // Ver los postulantes de un proyecto específico
+    Route::get('/projects/{project}/applicants', [ProjectController::class, 'applicants'])->name('projects.applicants');
+    //Ruta para marcar como leidas las notificaciones de una empresa
+    Route::patch('/notifications/{id}/read', function($id) {
+        $notification = auth()->user()->notifications()->findOrFail($id);
+        $notification->markAsRead();
+        // Nota: Si prefieres eliminarla permanentemente de la BD usa: $notification->delete();
+        return back();
+    })->name('notifications.read');
 });
 
 require __DIR__.'/auth.php';

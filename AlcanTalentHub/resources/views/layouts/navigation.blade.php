@@ -34,10 +34,20 @@
                             <x-slot name="content">
                                 @forelse(auth()->user()->unreadNotifications as $notification)
                                     <div class="p-3 border-b text-sm">
-                                        <p class="text-gray-800">{{ $notification->data['message'] }}</p>
-                                        <a href="{{ route('projects.show', $notification->data['project_id']) }}" class="text-blue-500 hover:underline mt-1 inline-block">
-                                            Ver proyecto
-                                        </a>
+                                        <p class="text-gray-800 mb-2">{{ $notification->data['message'] }}</p>
+                                        <div class="flex justify-between items-center">
+                                            <a href="{{ route('projects.show', $notification->data['project_id']) }}" class="text-blue-500 hover:underline inline-block">
+                                                Ver proyecto
+                                            </a>
+
+                                            <form action="{{ route('notifications.read', $notification->id) }}" method="POST">
+                                                @csrf
+                                                @method('PATCH')
+                                                <button type="submit" class="text-xs text-red-500 hover:text-red-700 font-semibold">
+                                                    Marcar como vista
+                                                </button>
+                                            </form>
+                                        </div>
                                     </div>
                                 @empty
                                     <div class="p-3 text-sm text-gray-500">No tienes notificaciones nuevas.</div>
