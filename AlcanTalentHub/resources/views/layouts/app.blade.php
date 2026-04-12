@@ -29,6 +29,22 @@
 
             <!-- Page Content -->
             <main>
+                <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 mt-4">
+                    {{-- Mensaje de Éxito --}}
+                    @if (session('success'))
+                        <div class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative shadow-sm" role="alert">
+                            <span class="block sm:inline">{{ session('success') }}</span>
+                        </div>
+                    @endif
+
+                    {{-- Mensaje de Error (Como el del CV faltante) --}}
+                    @if (session('error'))
+                        <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative shadow-sm" role="alert">
+                            <strong class="font-bold">¡Error!</strong>
+                            <span class="block sm:inline">{{ session('error') }}</span>
+                        </div>
+                    @endif
+                </div>
                 {{ $slot }}
             </main>
         </div>

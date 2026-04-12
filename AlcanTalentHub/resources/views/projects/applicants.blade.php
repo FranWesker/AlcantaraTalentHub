@@ -26,6 +26,7 @@
                                 <tr>
                                     <th scope="col" class="px-6 py-3">Nombre del Alumno</th>
                                     <th scope="col" class="px-6 py-3">Estado Actual</th>
+                                    <th scope="col" class="px-6 py-3 text-center">Currículum</th>
                                     <th scope="col" class="px-6 py-3 text-right">Acciones</th>
                                 </tr>
                             </thead>
@@ -44,6 +45,18 @@
                                                 <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-semibold">Aceptado</span>
                                             @else
                                                 <span class="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-semibold">Rechazado</span>
+                                            @endif
+                                        </td>
+
+                                        <td class="px-6 py-4 text-center">
+                                            @if($applicant->profile && $applicant->profile->cv_pdf_path)
+                                                <a href="{{ Storage::url($applicant->profile->cv_pdf_path) }}"
+                                                   target="_blank"
+                                                   class="inline-block px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-xs font-semibold shadow-sm transition duration-150 ease-in-out">
+                                                    Ver CV
+                                                </a>
+                                            @else
+                                                <span class="text-gray-400 italic text-xs">Sin CV</span>
                                             @endif
                                         </td>
 

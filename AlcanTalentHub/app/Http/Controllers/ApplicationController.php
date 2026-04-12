@@ -12,12 +12,19 @@ class ApplicationController extends Controller
 {
     /**
      * Un estudiante postula a un proyecto
+     * * Evitamos las postulaciones dublicadas
+     * ! Verificamos que el estudiante tenga su CV subido antes de postularse
      * @param Request $request
      * @param Project $project
      * @return \Illuminate\Http\RedirectResponse
      */
     public function store(Request $request, Project $project){
         $student = auth()->user();
+
+        //  Verificar que el usuario autenticando que el usuario estudiante tiene el CV subido a su perfil
+        if (!$student->profile || empty($student->profile->cv_pdf_path)) {
+            return back()->with('error', 'Debes subir tu CV antes de postularte a un proyecto.');
+        }
 
         // Evitar postulación duplicada
         if ($project->applicants()->where('student_id', $student->id)->exists()) {
