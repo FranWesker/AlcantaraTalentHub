@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Project;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class ProjectController extends Controller
 {
@@ -92,15 +93,22 @@ class ProjectController extends Controller
 
     /**
      * Muestra la lista de proyectos activos a los que un usuario se puede postular
+     * @param Request $request
      * @return \Illuminate\Contracts\View\View
      */
-    public function index(){
-        // Recuperamos todos los proyectos junto con la empresa que los creó.
-        // Filtramos solo los activos y los ordenamos por los más recientes.
-        $projects = Project::with('company')
-            ->where('is_active', true)
-            ->latest()
-            ->paginate(9); // Paginamos de 9 en 9
+    public function index(Request $request){
+        $user = $request->user();
+
+        // Construimos la consulta
+        $projectsQuery = Project::query()
+            ->where('is_active', true); // Solo mostramos proyectos activos
+
+        // Si el usuario es un estudiante, aplicamos el scope para ocultar los rechazados
+        if ($user && $user->user_type === 'student') {
+             $projectsQuery->hideRejectedForStudent($user);
+        }
+
+        $projects = $projectsQuery->latest()->paginate(10);
 
         return view('projects.index', compact('projects'));
     }
@@ -129,8 +137,10 @@ class ProjectController extends Controller
      * @param Project $project
      * @return \Illuminate\Contracts\View\View
      */
-    public function show(Project $project)
-    {
+    public function show(Project $project){
+        // Si la política retorna false (ej. estudiante rechazado), aborta con un 403.
+        Gate::authorize('view', $project);
+
         $isOwner = auth()->check() && auth()->id() === $project->company_id;
 
         $pendingApplicants = collect();
@@ -173,4 +183,6 @@ class ProjectController extends Controller
 
         return view('projects.applicants', compact('project', 'applicants'));
     }
+
+
 }
