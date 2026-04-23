@@ -103,8 +103,8 @@ class ProjectController extends Controller
         $projectsQuery = Project::query()
             ->where('is_active', true); // Solo mostramos proyectos activos
 
-        // Si el usuario es un estudiante, aplicamos el scope para ocultar los rechazados
-        if ($user && $user->user_type === 'student') {
+        // Corregido: Usamos el método isStudent() del modelo User
+        if ($user && $user->isStudent()) {
              $projectsQuery->hideRejectedForStudent($user);
         }
 

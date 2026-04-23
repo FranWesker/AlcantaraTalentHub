@@ -55,14 +55,14 @@ class Project extends Model
      */
     public function scopeHideRejectedForStudent($query, $user)
     {
-        if (! $user || $user->user_type !== 'student') {
+        // Si no hay usuario autenticado o el usuario no es estudiante, no aplicamos el filtro
+        if (! $user || !$user->isStudent()) {
             return $query;
         }
 
-        // ¡IMPORTANTE! Cambiamos 'applications' por 'applicants'
-        return $query->whereDoesntHave('applicants', function ($q) use ($user) {
-            $q->where('user_id', $user->id) // Asegúrate de que tu tabla pivot use 'user_id'
-              ->where('applications.status', 'rejected'); // Especificar la tabla para evitar ambigüedades
+        return $query->whereDoesntHave('applications', function ($q) use ($user) {
+            $q->where('student_id', $user->id)
+              ->where('status', 'rejected');
         });
     }
 }
