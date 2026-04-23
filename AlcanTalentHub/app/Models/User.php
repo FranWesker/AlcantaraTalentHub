@@ -73,12 +73,6 @@ class User extends Authenticatable
                     ->using(Application::class);
     }
 
-    public function projects()
-    {
-        // Una empresa tiene muchos proyectos creados
-        return $this->hasMany(Project::class, 'user_id');
-    }
-
     public function isStudent()
     {
         // Aquí debes ajustar la lógica según cómo determines el rol de estudiante en tu aplicación

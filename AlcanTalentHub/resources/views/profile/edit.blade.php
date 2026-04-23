@@ -12,12 +12,15 @@
                     @include('profile.partials.update-profile-information-form')
                 </div>
             </div>
-            {{-- Aqui se es para gestionar el CV --}}
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    @include('profile.partials.manage-cv-form')
+
+            {{-- Gestion del CV solamente visible para Estudiantes --}}
+            @if (auth()->user()->isStudent())
+                <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
+                    <div class="max-w-xl">
+                        @include('profile.partials.manage-cv-form')
+                    </div>
                 </div>
-            </div>
+            @endif
 
             <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
                 <div class="max-w-xl">
