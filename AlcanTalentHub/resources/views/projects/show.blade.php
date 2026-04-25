@@ -26,7 +26,7 @@
                 </div>
             </div>
 
-            {{-- PANEL DE ADMINISTRACIÓN DE LA EMPRESA --}}
+            {{-- PANEL DE ADMINISTRACIÓN DE LA EMPRESA // Esto lo tengo que eliminar --}}
             @if($isOwner)
 
                 {{-- Sección: Postulaciones Pendientes --}}

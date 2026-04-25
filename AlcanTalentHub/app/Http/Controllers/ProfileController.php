@@ -27,6 +27,7 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
+        //Actualizamos los datos básicos del usuario (Nombre y Email)
         $request->user()->fill($request->validated());
 
         if ($request->user()->isDirty('email')) {
@@ -34,6 +35,24 @@ class ProfileController extends Controller
         }
 
         $request->user()->save();
+
+        //Comprobamos si el usuario tiene un perfil de estudiante
+        if ($request->user()->profile) {
+
+            // Validamos las URLs.
+            // 'nullable' significa que no son obligatorias.
+            // 'url' asegura que tengan un formato web correcto (http://...)
+            $request->validate([
+                'github_url' => ['nullable', 'url', 'max:255'],
+                'linkedin_url' => ['nullable', 'url', 'max:255'],
+            ]);
+
+            // Guardamos las URLs en el perfil del estudiante
+            $request->user()->profile->update([
+                'github_url' => $request->input('github_url'),
+                'linkedin_url' => $request->input('linkedin_url'),
+            ]);
+        }
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }

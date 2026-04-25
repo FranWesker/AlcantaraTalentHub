@@ -36,7 +36,7 @@
                                     <div class="p-3 border-b text-sm">
                                         <p class="text-gray-800 mb-2">{{ $notification->data['message'] }}</p>
                                         <div class="flex justify-between items-center">
-                                            <a href="{{ route('projects.show', $notification->data['project_id']) }}" class="text-blue-500 hover:underline inline-block">
+                                            <a href="{{ route('projects.applicants', $notification->data['project_id']) }}" class="text-blue-500 hover:underline inline-block">
                                                 Ver proyecto
                                             </a>
 
@@ -124,7 +124,7 @@
                             @endif
                         </div>
                         @forelse(auth()->user()->unreadNotifications as $notification)
-                            <a href="{{ route('projects.show', $notification->data['project_id']) }}" class="block ps-3 pe-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300 focus:outline-none focus:text-gray-800 focus:bg-gray-50 focus:border-gray-300 transition duration-150 ease-in-out">
+                            <a href="{{ route('projects.applicants', $notification->data['project_id']) }}" class="block ps-3 pe-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300 focus:outline-none focus:text-gray-800 focus:bg-gray-50 focus:border-gray-300 transition duration-150 ease-in-out">
                                 <span class="text-sm block text-gray-500">{{ $notification->data['message'] }}</span>
                             </a>
                         @empty

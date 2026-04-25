@@ -46,7 +46,19 @@
                 </div>
             @endif
         </div>
+        @if ($user->profile)
+            <div>
+                <x-input-label for="github_url" :value="__('URL de GitHub')" />
+                <x-text-input id="github_url" name="github_url" type="url" class="mt-1 block w-full" :value="old('github_url', $user->profile->github_url)" placeholder="https://github.com/tu-usuario" autocomplete="url" />
+                <x-input-error class="mt-2" :messages="$errors->get('github_url')" />
+            </div>
 
+            <div>
+                <x-input-label for="linkedin_url" :value="__('URL de LinkedIn')" />
+                <x-text-input id="linkedin_url" name="linkedin_url" type="url" class="mt-1 block w-full" :value="old('linkedin_url', $user->profile->linkedin_url)" placeholder="https://linkedin.com/in/tu-usuario" autocomplete="url" />
+                <x-input-error class="mt-2" :messages="$errors->get('linkedin_url')" />
+            </div>
+        @endif
         <div class="flex items-center gap-4">
             <x-primary-button>{{ __('Save') }}</x-primary-button>
 
