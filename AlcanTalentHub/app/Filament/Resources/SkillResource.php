@@ -23,7 +23,11 @@ class SkillResource extends Resource
     {
         return $form
             ->schema([
-                //
+                // Añadimos un campo de texto para el nombre
+                Forms\Components\TextInput::make('name')
+                    ->label('Nombre de la Habilidad')
+                    ->required() // Lo hago obligatorio, coincidiendo asi con la base de datos
+                    ->maxLength(255), // Limito la longitud a 255 caracteres
             ]);
     }
 
@@ -31,7 +35,11 @@ class SkillResource extends Resource
     {
         return $table
             ->columns([
-                //
+                // Añadimos una columna para poder ver el nombre de la habilidad en la tabla
+                Tables\Columns\TextColumn::make('name')
+                    ->label('Nombre')
+                    ->searchable() // Hacemos que esta columna sea buscable
+                    ->sortable(), // Hacemos que esta columna sea ordenable
             ])
             ->filters([
                 //
