@@ -3,6 +3,7 @@
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\StudentSkillController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/welcom', function () {
@@ -52,6 +53,10 @@ Route::middleware('auth')->group(function () {
         // Nota: Si prefieres eliminarla permanentemente de la BD usa: $notification->delete();
         return back();
     })->name('notifications.read');
+
+    // Rutas para gestionar las skills del estudiante
+    Route::get('/profile/skills', [StudentSkillController::class, 'index'])->name('profile.skills');
+    Route::post('/profile/skills', [StudentSkillController::class, 'update'])->name('profile.skills.update');
 });
 
 require __DIR__.'/auth.php';

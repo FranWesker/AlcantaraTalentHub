@@ -12,6 +12,11 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
+                    @if(Auth::user()->isStudent())
+                        <x-nav-link :href="route('profile.skills')" :active="request()->routeIs('profile.skills')">
+                            {{ __('Mis Habilidades') }}
+                        </x-nav-link>
+                    @endif
                 </div>
             </div>
 
