@@ -177,12 +177,10 @@ class ProjectController extends Controller
 
         // Recuperamos los postulantes, pero FILTRAMOS para que no traiga a los 'rejected'
         $applicants = $project->applicants()
-                              ->wherePivot('status', '!=', 'rejected')
-                              ->with('profile')
-                              ->get();
+                          ->wherePivot('status', '!=', 'rejected')
+                          ->with(['profile', 'skills'])
+                          ->get();
 
         return view('projects.applicants', compact('project', 'applicants'));
     }
-
-
 }

@@ -20,6 +20,7 @@
                                 <tr>
                                     <th scope="col" class="px-6 py-3">Nombre del Alumno</th>
                                     <th scope="col" class="px-6 py-3">Estado Actual</th>
+                                    <th scope="col" class="px-6 py-3">Habilidades</th>
                                     <th scope="col" class="px-6 py-3 text-center">Currículum</th>
                                     <th scope="col" class="px-6 py-3 text-right">Acciones</th>
                                 </tr>
@@ -42,6 +43,20 @@
                                             @endif
                                         </td>
 
+                                        <td class="px-6 py-4">
+                                            @if($applicant->skills && $applicant->skills->isNotEmpty())
+                                                <div class="flex flex-wrap gap-2">
+                                                    @foreach($applicant->skills as $skill)
+                                                        <span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300">
+                                                            {{ $skill->name }}
+                                                        </span>
+                                                    @endforeach
+                                                </div>
+                                            @else
+                                                <span class="text-gray-400 dark:text-gray-500 italic text-xs">Sin habilidades especificadas</span>
+                                            @endif
+                                        </td>
+
                                         <td class="px-6 py-4 text-center">
                                             @if($applicant->profile && $applicant->profile->cv_pdf_path)
                                                 <a href="{{ Storage::url($applicant->profile->cv_pdf_path) }}"
@@ -61,7 +76,7 @@
                                                     @csrf
                                                     @method('PATCH')
                                                     <input type="hidden" name="status" value="accepted">
-                                                    <button type="submit" class="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-xs font-semibold shadow-sm">
+                                                    <button type="submit" class="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-xs font-semibold shadow-sm transition duration-150 ease-in-out">
                                                         Aceptar
                                                     </button>
                                                 </form>
@@ -72,7 +87,7 @@
                                                     @csrf
                                                     @method('PATCH')
                                                     <input type="hidden" name="status" value="rejected">
-                                                    <button type="submit" class="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-xs font-semibold shadow-sm">
+                                                    <button type="submit" class="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-xs font-semibold shadow-sm transition duration-150 ease-in-out">
                                                         Rechazar
                                                     </button>
                                                 </form>
@@ -87,7 +102,7 @@
                 @endif
 
                 <div class="mt-6">
-                    <a href="{{ route('dashboard') }}" class="text-indigo-600 hover:text-indigo-900">&larr; Volver al panel</a>
+                    <a href="{{ route('dashboard') }}" class="text-indigo-600 hover:text-indigo-900 transition duration-150 ease-in-out">&larr; Volver al panel</a>
                 </div>
             </div>
         </div>
