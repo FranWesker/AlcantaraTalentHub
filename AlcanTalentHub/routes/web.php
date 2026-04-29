@@ -57,6 +57,9 @@ Route::middleware('auth')->group(function () {
     // Rutas para gestionar las skills del estudiante
     Route::get('/profile/skills', [StudentSkillController::class, 'index'])->name('profile.skills');
     Route::post('/profile/skills', [StudentSkillController::class, 'update'])->name('profile.skills.update');
+
+    // Ruta para la búsqueda AJAX de proyectos
+    Route::get('/projects/search', [ProjectController::class, 'search'])->name('projects.search');
 });
 
 require __DIR__.'/auth.php';

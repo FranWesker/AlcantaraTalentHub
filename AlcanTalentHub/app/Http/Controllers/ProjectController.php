@@ -183,4 +183,40 @@ class ProjectController extends Controller
 
         return view('projects.applicants', compact('project', 'applicants'));
     }
+    /**
+     * Busca proyectos por descripción y devuelve JSON.
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function search(Request $request)
+    {
+        // Obtenemos el texto del buscador
+        $query = $request->input('query');
+
+        if ($query) {
+            // Dividimos el texto en palabras
+            $palabras = explode(' ', $query);
+
+            $projects = Project::with('company')->where(function ($queryBuilder) use ($palabras) {
+
+                foreach ($palabras as $palabra) {
+                    // 2. Limpiamos espacios y convertimos la palabra del usuario a minúsculas
+                    $palabraLimpia = strtolower(trim($palabra));
+
+                    if (!empty($palabraLimpia)) {
+                        // 3. Usamos whereRaw para forzar a la base de datos a usar LOWER()
+                        // Esto asegura que la descripción se evalúe en minúsculas al comparar
+                        $queryBuilder->orWhereRaw('LOWER(description) LIKE ?', ["%{$palabraLimpia}%"]);
+                    }
+                }
+            })->get();
+
+        } else {
+            // Si el buscador está vacío, devolvemos todos los proyectos
+            $projects = Project::with('company')->get();
+        }
+
+        // Devolvemos la respuesta en formato JSON
+        return response()->json($projects);
+    }
 }

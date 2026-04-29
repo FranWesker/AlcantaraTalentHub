@@ -15,32 +15,43 @@
                         <p class="text-gray-600 dark:text-gray-400">Descubre oportunidades y postúlate a los proyectos de nuestras empresas colaboradoras.</p>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Campo de búsqueda -->
+                    <div class="mb-8">
+                        <label for="searchInput" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Buscador Avanzado</label>
+                        <input
+                            type="text"
+                            id="searchInput"
+                            placeholder="Busca proyectos por descripción..."
+                            class="mt-1 w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm p-2 focus:ring focus:ring-indigo-200 focus:border-indigo-500"
+                        >
+                    </div>
+
+                    <!-- Contenedor de Proyectos -->
+                    <!-- projectsContainer' asignado al grid real -->
+                    <div id="projectsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Renderizado inicial con Blade -->
                         @forelse($projects as $project)
                             <div class="bg-gray-50 dark:bg-gray-700 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-600 flex flex-col h-full hover:shadow-md transition-shadow duration-300">
-
                                 <div class="flex-grow">
                                     <div class="flex justify-between items-start mb-4">
                                         <h4 class="text-xl font-bold text-indigo-600 dark:text-indigo-400 leading-tight">
                                             {{ $project->title }}
                                         </h4>
                                     </div>
-
                                     <div class="mb-4">
                                         <span class="inline-flex items-center text-sm font-medium text-gray-500 dark:text-gray-300">
                                             <svg class="w-4 h-4 mr-1 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3a1 1 0 01-1-1v-2a1 1 0 00-1-1H9a1 1 0 00-1 1v2a1 1 0 01-1 1H4a1 1 0 110-2V4zm3 1h2v2H7V5zm2 4H7v2h2V9zm2-4h2v2h-2V5zm2 4h-2v2h2V9z" clip-rule="evenodd"></path></svg>
                                             {{ $project->company->name ?? 'Empresa Confidencial' }}
                                         </span>
                                     </div>
-
                                     <p class="text-sm text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
                                         {{ $project->description }}
                                     </p>
                                 </div>
                                 <div class="mt-4 flex justify-between items-center">
                                     <span class="text-xs text-gray-500 dark:text-gray-400">
-                                            Publicado: {{ $project->created_at->diffForHumans() }}
-                                        </span>
+                                        Publicado: {{ $project->created_at->diffForHumans() }}
+                                    </span>
                                     <a href="{{ route('projects.show', $project) }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 rounded-md font-semibold text-xs text-white uppercase hover:bg-indigo-700">
                                         Ver más
                                     </a>
@@ -57,7 +68,8 @@
                         @endforelse
                     </div>
 
-                    <div class="mt-8">
+                    <!-- Paginación -->
+                    <div id="paginationContainer" class="mt-8">
                         {{ $projects->links() }}
                     </div>
 
@@ -65,4 +77,88 @@
             </div>
         </div>
     </div>
+
+    <!-- Lógica JavaScript (Fetch) -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const searchInput = document.getElementById('searchInput');
+            const projectsContainer = document.getElementById('projectsContainer');
+            const paginationContainer = document.getElementById('paginationContainer'); // Para ocultar la paginación al buscar
+
+            if (!searchInput || !projectsContainer) return;
+
+            searchInput.addEventListener('keyup', function () {
+                const query = searchInput.value;
+
+                // Ocultar paginación si se está buscando
+                if (paginationContainer) {
+                    paginationContainer.style.display = query.trim() !== '' ? 'none' : 'block';
+                }
+
+                fetch(`/projects/search?query=${encodeURIComponent(query)}`, {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error("Error en la respuesta");
+                    return response.json();
+                })
+                .then(data => {
+                    projectsContainer.innerHTML = ''; // Limpiamos el contenedor
+
+                    if (data.length === 0) {
+                        projectsContainer.innerHTML = `
+                            <div class="col-span-full py-12 px-4 text-center bg-gray-50 dark:bg-gray-800/50 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600">
+                                <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-gray-200">No se encontraron proyectos</h3>
+                                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">No hay coincidencias con tu búsqueda.</p>
+                            </div>`;
+                        return;
+                    }
+
+                    data.forEach(project => {
+                        // Procesar el nombre de la empresa (depende del controlador)
+                        const companyName = (project.company && project.company.name) ? project.company.name : 'Empresa Confidencial';
+
+                        // Formatear la fecha para JS
+                        const dateObj = new Date(project.created_at);
+                        const formattedDate = dateObj.toLocaleDateString();
+
+                        const projectHTML = `
+                            <div class="bg-gray-50 dark:bg-gray-700 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-600 flex flex-col h-full hover:shadow-md transition-shadow duration-300">
+                                <div class="flex-grow">
+                                    <div class="flex justify-between items-start mb-4">
+                                        <h4 class="text-xl font-bold text-indigo-600 dark:text-indigo-400 leading-tight">
+                                            ${project.title}
+                                        </h4>
+                                    </div>
+                                    <div class="mb-4">
+                                        <span class="inline-flex items-center text-sm font-medium text-gray-500 dark:text-gray-300">
+                                            <svg class="w-4 h-4 mr-1 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3a1 1 0 01-1-1v-2a1 1 0 00-1-1H9a1 1 0 00-1 1v2a1 1 0 01-1 1H4a1 1 0 110-2V4zm3 1h2v2H7V5zm2 4H7v2h2V9zm2-4h2v2h-2V5zm2 4h-2v2h2V9z" clip-rule="evenodd"></path></svg>
+                                            ${companyName}
+                                        </span>
+                                    </div>
+                                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
+                                        ${project.description}
+                                    </p>
+                                </div>
+                                <div class="mt-4 flex justify-between items-center">
+                                    <span class="text-xs text-gray-500 dark:text-gray-400">
+                                        Publicado: ${formattedDate}
+                                    </span>
+                                    <a href="/projects/${project.id}" class="inline-flex items-center px-4 py-2 bg-indigo-600 rounded-md font-semibold text-xs text-white uppercase hover:bg-indigo-700">
+                                        Ver más
+                                    </a>
+                                </div>
+                            </div>
+                        `;
+                        projectsContainer.insertAdjacentHTML('beforeend', projectHTML);
+                    });
+                })
+                .catch(error => console.error('Error AJAX:', error));
+            });
+        });
+    </script>
 </x-app-layout>
