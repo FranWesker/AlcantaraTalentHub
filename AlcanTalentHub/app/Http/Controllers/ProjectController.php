@@ -100,7 +100,7 @@ class ProjectController extends Controller
         $user = $request->user();
 
         // Construimos la consulta
-        $projectsQuery = Project::query()
+        $projectsQuery = Project::with('company')
             ->where('is_active', true); // Solo mostramos proyectos activos
 
         // Corregido: Usamos el método isStudent() del modelo User
@@ -190,33 +190,35 @@ class ProjectController extends Controller
      */
     public function search(Request $request)
     {
-        // Obtenemos el texto del buscador
         $query = $request->input('query');
+        $user = auth()->user();
 
+        // Iniciamos la consulta base: Siempre con la empresa y solo proyectos activos
+        $projectsQuery = Project::with('company')->where('is_active', true);
+
+        // Si es estudiante, ocultamos los proyectos donde fue rechazado (igual que en el index)
+        if ($user && method_exists($user, 'isStudent') && $user->isStudent()) {
+             $projectsQuery->hideRejectedForStudent($user);
+        }
+
+        // Si el usuario escribió algo en el buscador, aplicamos los filtros
         if ($query) {
-            // Dividimos el texto en palabras
             $palabras = explode(' ', $query);
 
-            $projects = Project::with('company')->where(function ($queryBuilder) use ($palabras) {
-
+            $projectsQuery->where(function ($queryBuilder) use ($palabras) {
                 foreach ($palabras as $palabra) {
-                    // 2. Limpiamos espacios y convertimos la palabra del usuario a minúsculas
                     $palabraLimpia = strtolower(trim($palabra));
 
                     if (!empty($palabraLimpia)) {
-                        // 3. Usamos whereRaw para forzar a la base de datos a usar LOWER()
-                        // Esto asegura que la descripción se evalúe en minúsculas al comparar
                         $queryBuilder->orWhereRaw('LOWER(description) LIKE ?', ["%{$palabraLimpia}%"]);
                     }
                 }
-            })->get();
-
-        } else {
-            // Si el buscador está vacío, devolvemos todos los proyectos
-            $projects = Project::with('company')->get();
+            });
         }
 
-        // Devolvemos la respuesta en formato JSON
+        // Obtenemos los resultados ordenados por el más reciente
+        $projects = $projectsQuery->latest()->get();
+
         return response()->json($projects);
     }
 }

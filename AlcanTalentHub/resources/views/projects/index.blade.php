@@ -94,12 +94,15 @@
                 if (paginationContainer) {
                     paginationContainer.style.display = query.trim() !== '' ? 'none' : 'block';
                 }
+                // Usamos Blade de Laravel para que genere la URL absoluta correcta y le pegamos el texto buscado
+                const urlBusqueda = `{{ route('projects.search') }}?query=${encodeURIComponent(query)}`;
 
-                fetch(`/projects/search?query=${encodeURIComponent(query)}`, {
+                // Hacemos la petición a la URL generada por Laravel
+                fetch(urlBusqueda, {
                     method: 'GET',
                     headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json'
+                        'X-Requested-With': 'XMLHttpRequest', // Le indicamos a Laravel que es una petición de fondo (AJAX)
+                        'Accept': 'application/json'          // Esperamos una respuesta en formato JSON
                     }
                 })
                 .then(response => {

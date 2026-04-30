@@ -20,9 +20,16 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
     // Rutas para proyectos
     Route::get('/projects/create', [ProjectController::class, 'create'])->name('projects.create');
     Route::post('/projects', [ProjectController::class, 'store'])->name('projects.store');
+
+
+
+    // Colocamos la ruta de búsqueda ANTES de las rutas con variables {project} para que evitar conflictos
+    Route::get('/projects/search', [ProjectController::class, 'search'])->name('projects.search');
+
     Route::get('/projects/{project}/edit', [ProjectController::class, 'edit'])->name('projects.edit');
     Route::patch('/projects/{project}', [ProjectController::class, 'update'])->name('projects.update');
     Route::delete('/projects/{project}', [ProjectController::class, 'destroy'])->name('projects.destroy');
@@ -46,11 +53,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/projects/{project}/accept/{student}', [ApplicationController::class, 'accept'])->name('applications.accept');
     // Ver los postulantes de un proyecto específico
     Route::get('/projects/{project}/applicants', [ProjectController::class, 'applicants'])->name('projects.applicants');
-    //Ruta para marcar como leidas las notificaciones de una empresa
+
+    // Ruta para marcar como leidas las notificaciones de una empresa
     Route::patch('/notifications/{id}/read', function($id) {
         $notification = auth()->user()->notifications()->findOrFail($id);
         $notification->markAsRead();
-        // Nota: Si prefieres eliminarla permanentemente de la BD usa: $notification->delete();
         return back();
     })->name('notifications.read');
 
@@ -58,8 +65,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile/skills', [StudentSkillController::class, 'index'])->name('profile.skills');
     Route::post('/profile/skills', [StudentSkillController::class, 'update'])->name('profile.skills.update');
 
-    // Ruta para la búsqueda AJAX de proyectos
-    Route::get('/projects/search', [ProjectController::class, 'search'])->name('projects.search');
+    Route::resource('projects', ProjectController::class);
 });
 
 require __DIR__.'/auth.php';
