@@ -184,41 +184,29 @@ class ProjectController extends Controller
         return view('projects.applicants', compact('project', 'applicants'));
     }
     /**
-     * Busca proyectos por descripción y devuelve JSON.
+     * Busca proyectos mediante AJAX y devuelve JSON.
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function search(Request $request)
     {
-        $query = $request->input('query');
-        $user = auth()->user();
+        // Obtenemos el texto que el usuario escribió en el input (query)
+        $searchTerm = $request->input('query');
 
-        // Iniciamos la consulta base: Siempre con la empresa y solo proyectos activos
-        $projectsQuery = Project::with('company')->where('is_active', true);
-
-        // Si es estudiante, ocultamos los proyectos donde fue rechazado (igual que en el index)
-        if ($user && method_exists($user, 'isStudent') && $user->isStudent()) {
-             $projectsQuery->hideRejectedForStudent($user);
+        // Si la búsqueda está vacía, podemos devolver un arreglo vacío
+        if (empty($searchTerm)) {
+            return response()->json([]);
         }
 
-        // Si el usuario escribió algo en el buscador, aplicamos los filtros
-        if ($query) {
-            $palabras = explode(' ', $query);
+        // Realizamos la consulta a la base de datos
+        // Usamos 'with('company')' para traer la información de la empresa y evitar errores en JavaScript
+        $projects = Project::with('company')
+            ->where('title', 'LIKE', '%' . $searchTerm . '%')
+            ->orWhere('description', 'LIKE', '%' . $searchTerm . '%')
+            ->latest() // Ordenamos por los más recientes
+            ->get();
 
-            $projectsQuery->where(function ($queryBuilder) use ($palabras) {
-                foreach ($palabras as $palabra) {
-                    $palabraLimpia = strtolower(trim($palabra));
-
-                    if (!empty($palabraLimpia)) {
-                        $queryBuilder->orWhereRaw('LOWER(description) LIKE ?', ["%{$palabraLimpia}%"]);
-                    }
-                }
-            });
-        }
-
-        // Obtenemos los resultados ordenados por el más reciente
-        $projects = $projectsQuery->latest()->get();
-
+        // Devolvemos los datos en formato JSON para que Fetch API los pueda procesar
         return response()->json($projects);
     }
 }

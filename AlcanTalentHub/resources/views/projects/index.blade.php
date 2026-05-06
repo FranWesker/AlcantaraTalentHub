@@ -10,26 +10,27 @@
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
 
+                    <!-- Encabezado de la sección -->
                     <div class="mb-6">
                         <h3 class="text-2xl font-bold text-gray-800 dark:text-white">Proyectos Disponibles</h3>
                         <p class="text-gray-600 dark:text-gray-400">Descubre oportunidades y postúlate a los proyectos de nuestras empresas colaboradoras.</p>
                     </div>
 
-                    <!-- Campo de búsqueda -->
+                    <!-- Campo de búsqueda reactivo -->
                     <div class="mb-8">
                         <label for="searchInput" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Buscador Avanzado</label>
                         <input
                             type="text"
                             id="searchInput"
-                            placeholder="Busca proyectos por descripción..."
+                            placeholder="Busca proyectos por título o descripción..."
                             class="mt-1 w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm p-2 focus:ring focus:ring-indigo-200 focus:border-indigo-500"
                         >
                     </div>
 
-                    <!-- Contenedor de Proyectos -->
-                    <!-- projectsContainer' asignado al grid real -->
+                    <!-- Contenedor principal de Proyectos (donde JS inyectará los resultados) -->
                     <div id="projectsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <!-- Renderizado inicial con Blade -->
+
+                        <!-- Renderizado inicial con Laravel Blade -->
                         @forelse($projects as $project)
                             <div class="bg-gray-50 dark:bg-gray-700 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-600 flex flex-col h-full hover:shadow-md transition-shadow duration-300">
                                 <div class="flex-grow">
@@ -68,7 +69,7 @@
                         @endforelse
                     </div>
 
-                    <!-- Paginación -->
+                    <!-- Paginación tradicional de Laravel -->
                     <div id="paginationContainer" class="mt-8">
                         {{ $projects->links() }}
                     </div>
@@ -78,40 +79,46 @@
         </div>
     </div>
 
-    <!-- Lógica JavaScript (Fetch) -->
+    <!-- Script de Búsqueda Reactiva (AJAX/Fetch) -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            // Seleccionamos los elementos de la interfaz
             const searchInput = document.getElementById('searchInput');
             const projectsContainer = document.getElementById('projectsContainer');
-            const paginationContainer = document.getElementById('paginationContainer'); // Para ocultar la paginación al buscar
+            const paginationContainer = document.getElementById('paginationContainer');
 
+            // Protegemos el código por si los elementos no existen en la página
             if (!searchInput || !projectsContainer) return;
 
+            // Escuchamos el evento de tecleo en el buscador
             searchInput.addEventListener('keyup', function () {
                 const query = searchInput.value;
 
-                // Ocultar paginación si se está buscando
+                // Si hay texto, ocultamos la paginación original para no confundir al usuario
                 if (paginationContainer) {
                     paginationContainer.style.display = query.trim() !== '' ? 'none' : 'block';
                 }
-                // Usamos Blade de Laravel para que genere la URL absoluta correcta y le pegamos el texto buscado
+
+                // Generamos la URL llamando a la ruta que configuraste en tu backend
                 const urlBusqueda = `{{ route('projects.search') }}?query=${encodeURIComponent(query)}`;
 
-                // Hacemos la petición a la URL generada por Laravel
+                // Ejecutamos la petición AJAX
                 fetch(urlBusqueda, {
                     method: 'GET',
                     headers: {
-                        'X-Requested-With': 'XMLHttpRequest', // Le indicamos a Laravel que es una petición de fondo (AJAX)
-                        'Accept': 'application/json'          // Esperamos una respuesta en formato JSON
+                        'X-Requested-With': 'XMLHttpRequest', // Identifica la petición como AJAX
+                        'Accept': 'application/json'          // Solicitamos respuesta en JSON
                     }
                 })
                 .then(response => {
-                    if (!response.ok) throw new Error("Error en la respuesta");
+                    if (!response.ok) throw new Error("Error en la respuesta de la API");
                     return response.json();
                 })
                 .then(data => {
-                    projectsContainer.innerHTML = ''; // Limpiamos el contenedor
+                    // Vaciamos los proyectos actuales de la pantalla
+                    projectsContainer.innerHTML = '';
 
+                    // Si no hay resultados, mostramos un mensaje amigable
                     if (data.length === 0) {
                         projectsContainer.innerHTML = `
                             <div class="col-span-full py-12 px-4 text-center bg-gray-50 dark:bg-gray-800/50 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600">
@@ -121,11 +128,9 @@
                         return;
                     }
 
+                    // Si hay resultados, recorremos el arreglo y construimos el HTML de cada tarjeta
                     data.forEach(project => {
-                        // Procesar el nombre de la empresa (depende del controlador)
                         const companyName = (project.company && project.company.name) ? project.company.name : 'Empresa Confidencial';
-
-                        // Formatear la fecha para JS
                         const dateObj = new Date(project.created_at);
                         const formattedDate = dateObj.toLocaleDateString();
 
@@ -157,6 +162,7 @@
                                 </div>
                             </div>
                         `;
+                        // Insertamos la tarjeta generada en el contenedor principal
                         projectsContainer.insertAdjacentHTML('beforeend', projectHTML);
                     });
                 })
