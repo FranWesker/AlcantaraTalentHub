@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Models\Project;
 
 class User extends Authenticatable
 {
@@ -84,5 +85,21 @@ class User extends Authenticatable
         // Aquí debes ajustar la lógica según cómo determines el rol de empresa en tu aplicación
         // Ajusta esto a la lógica real de tu base de datos
         return $this->role === 'empresa';
+    }
+
+    /**
+     * Relación: Una empresa (User) tiene muchos Proyectos.
+     */
+    public function projects()
+    {
+        // Esto asume que en tu tabla 'projects' hay una columna llamada 'user_id'
+        return $this->hasMany(Project::class);
+
+        /*
+         * Nota importante:
+         * Si al crear la tabla 'projects' llamaste a la clave foránea de otra manera
+         * (por ejemplo, 'company_id'), debes indicarlo en el segundo parámetro así:
+         * return $this->hasMany(Project::class, 'company_id');
+         */
     }
 }
