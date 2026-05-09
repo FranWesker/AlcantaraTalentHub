@@ -15,19 +15,16 @@ use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\IconColumn;
 
 class ProjectResource extends Resource
 {
-    // Vinculamos este recurso a tu modelo Project
     protected static ?string $model = Project::class;
-
-    // Puedes cambiar el icono del menú lateral aquí
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-briefcase';
     protected static ?string $navigationLabel = 'Proyectos';
     protected static ?string $modelLabel = 'Proyecto';
@@ -49,7 +46,6 @@ class ProjectResource extends Resource
                     ->required()
                     ->columnSpanFull(),
 
-                // Usamos Select mapeado al campo booleano actual 'is_active'
                 Select::make('is_active')
                     ->label('Estado del Proyecto')
                     ->options([
@@ -57,7 +53,7 @@ class ProjectResource extends Resource
                         0 => 'Finalizado / Cancelado',
                     ])
                     ->required()
-                    ->native(false), // Hace que el select se vea más moderno (búsqueda integrada)
+                    ->native(false),
             ]);
     }
 
@@ -70,38 +66,13 @@ class ProjectResource extends Resource
     {
         return $table
             ->columns([
-                // Nombre del proyecto
-                TextColumn::make('title')
-                    ->label('Nombre del Proyecto')
-                    ->searchable()
-                    ->sortable(),
-
-                // Descripción del proyecto
-                TextColumn::make('description')
-                    ->label('Descripción')
-                    ->limit(50) // Limitamos a 50 caracteres para no desbordar la tabla visualmente
-                    ->searchable(),
-
-                // Estado: ¿Está activo o no?
-                IconColumn::make('is_active') // Cámbialo a 'status' o 'active' según tu base de datos
-                    ->label('¿Activo?')
-                    ->boolean(), // Muestra un check verde o una X roja
-
-                // 4. Nombre de la empresa dueña
-                TextColumn::make('company.name') // Si la relación se llama 'company', cambia 'user.name' por 'company.name'
-                    ->label('Empresa')
-                    ->searchable()
-                    ->sortable(),
-
-                // 5. Número de alumnos postulados
-                TextColumn::make('applications_count') // Esto cuenta automáticamente la relación
-                    ->counts('applications')
-                    ->label('Nº Alumnos Postulados')
-                    ->sortable(),
+                TextColumn::make('title')->label('Nombre del Proyecto')->searchable()->sortable(),
+                TextColumn::make('description')->label('Descripción')->limit(50)->searchable(),
+                IconColumn::make('is_active')->label('¿Activo?')->boolean(),
+                TextColumn::make('company.name')->label('Empresa')->searchable()->sortable(),
+                TextColumn::make('applications_count')->counts('applications')->label('Nº Alumnos Postulados')->sortable(),
             ])
-            ->filters([
-                // Aquí podrías añadir filtros en el futuro
-            ])
+            ->filters([])
             ->actions([
                 ViewAction::make(),
                 EditAction::make(),
@@ -116,7 +87,6 @@ class ProjectResource extends Resource
     public static function getRelations(): array
     {
         return [
-            // Registramos el RelationManager aquí para que aparezca en la vista de edición
             ApplicationsRelationManager::class,
         ];
     }
