@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Companies;
 
+use App\Filament\Resources\CompanyResource\RelationManagers\PublishedProjectsRelationManager;
 use App\Filament\Resources\CompanyResource\Pages;
 use App\Filament\Resources\Companies\Pages\CreateCompany;
 use App\Filament\Resources\Companies\Pages\EditCompany;
@@ -101,7 +102,7 @@ class CompanyResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            PublishedProjectsRelationManager::class,
         ];
     }
 
