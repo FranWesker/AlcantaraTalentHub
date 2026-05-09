@@ -102,4 +102,10 @@ class User extends Authenticatable
          * return $this->hasMany(Project::class, 'company_id');
          */
     }
+
+    public function isAdmin(): bool
+    {
+        // Ajusta 'role' y 'admin' según cómo tengas configurada tu tabla de usuarios
+        return $this->role === 'admin';
+    }
 }

@@ -54,7 +54,8 @@ class ProjectPolicy
      */
     public function update(User $user, Project $project): bool
     {
-        return false;
+        // Puede editar si es ADMIN o si es la EMPRESA dueña del proyecto
+        return $user->isAdmin() || $user->id === $project->company_id;
     }
 
     /**
@@ -62,7 +63,8 @@ class ProjectPolicy
      */
     public function delete(User $user, Project $project): bool
     {
-        return false;
+        // Puede eliminar si es ADMIN o si es la EMPRESA dueña del proyecto
+        return $user->isAdmin() || $user->id === $project->company_id;
     }
 
     /**

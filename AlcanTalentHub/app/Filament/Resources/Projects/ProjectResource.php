@@ -6,14 +6,14 @@ use App\Filament\Resources\Projects\Pages\CreateProject;
 use App\Filament\Resources\Projects\Pages\EditProject;
 use App\Filament\Resources\Projects\Pages\ListProjects;
 use App\Filament\Resources\Projects\Pages\ViewProject;
-use App\Filament\Resources\Projects\Schemas\ProjectForm;
+use App\Filament\Resources\Projects\RelationManagers\ApplicationsRelationManager;
 use App\Filament\Resources\Projects\Schemas\ProjectInfolist;
-use App\Filament\Resources\Projects\Tables\ProjectsTable;
 use App\Models\Project;
-use BackedEnum;
+use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
@@ -21,7 +21,6 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\IconColumn;
-use Filament\Tables;
 
 class ProjectResource extends Resource
 {
@@ -39,7 +38,26 @@ class ProjectResource extends Resource
     {
         return $schema
             ->schema([
-                // Aquí irían los campos para crear/editar un proyecto
+                TextInput::make('title')
+                    ->label('Nombre del Proyecto')
+                    ->required()
+                    ->maxLength(255)
+                    ->columnSpanFull(),
+
+                RichEditor::make('description')
+                    ->label('Descripción del Proyecto')
+                    ->required()
+                    ->columnSpanFull(),
+
+                // Usamos Select mapeado al campo booleano actual 'is_active'
+                Select::make('is_active')
+                    ->label('Estado del Proyecto')
+                    ->options([
+                        1 => 'Abierto / Activo',
+                        0 => 'Finalizado / Cancelado',
+                    ])
+                    ->required()
+                    ->native(false), // Hace que el select se vea más moderno (búsqueda integrada)
             ]);
     }
 
@@ -98,7 +116,8 @@ class ProjectResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            // Registramos el RelationManager aquí para que aparezca en la vista de edición
+            ApplicationsRelationManager::class,
         ];
     }
 
