@@ -11,6 +11,7 @@ use App\Filament\Resources\Students\Schemas\StudentForm;
 use App\Filament\Resources\Students\Schemas\StudentInfolist;
 use App\Filament\Resources\Students\Tables\StudentsTable;
 use App\Models\User;
+use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -22,6 +23,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Actions\EditAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Schemas\Components\Section;
 
 
 class StudentResource extends Resource
@@ -37,9 +39,70 @@ class StudentResource extends Resource
     protected static ?string $modelLabel = 'Estudiante';
     protected static ?string $pluralModelLabel = 'Estudiantes';
 
+    /**
+     * Formulario donde se edita el usuario estudiante
+     * @param Schema $schema
+     * @return Schema
+     */
     public static function form(Schema $schema): Schema
     {
-        return StudentForm::configure($schema);
+        return $schema
+        ->schema([
+            // Editamos el nombre y correo del usuario, que se mantienen en la tabla 'users'
+            Section::make('Información de la Cuenta')
+                ->schema([
+                    // Los inputs sí se mantienen dentro de Forms
+                    Forms\Components\TextInput::make('name')
+                        ->label('Nombre Completo')
+                        ->required()
+                        ->maxLength(255),
+                    Forms\Components\TextInput::make('email')
+                        ->label('Correo Electrónico')
+                        ->email()
+                        ->required()
+                        ->unique(ignoreRecord: true),
+                ])->columns(2),
+
+            // Gestion de Links y CV del estudiante
+            Section::make('Perfil del Estudiante')
+                ->description('Gestiona los enlaces sociales y el currículum')
+                ->schema([
+                    Forms\Components\TextInput::make('profile.github_url')
+                        ->label('URL de GitHub')
+                        ->url()
+                        ->placeholder('https://github.com/usuario'),
+
+                    Forms\Components\TextInput::make('profile.linkedin_url')
+                        ->label('URL de LinkedIn')
+                        ->url()
+                        ->placeholder('https://linkedin.com/in/usuario'),
+
+                    Forms\Components\FileUpload::make('profile.cv_pdf_path')
+                        ->label('Currículum Vítae (PDF)')
+                        ->acceptedFileTypes(['application/pdf'])
+                        ->directory('cvs')
+                        ->downloadable()
+                        ->openable()
+                        ->previewable()
+                        ->deletable()
+                        ->maxSize(2048),
+                ])->columns(2),
+
+            // Gestión de Habilidades
+            Section::make('Habilidades Técnicas')
+                ->schema([
+                    Forms\Components\Select::make('skills')
+                        ->label('Habilidades')
+                        ->relationship('skills', 'name')
+                        ->multiple()
+                        ->preload()
+                        ->searchable()
+                        ->createOptionForm([
+                            Forms\Components\TextInput::make('name')
+                                ->required(),
+                        ]),
+                ]),
+        ]);
     }
 
     public static function infolist(Schema $schema): Schema
