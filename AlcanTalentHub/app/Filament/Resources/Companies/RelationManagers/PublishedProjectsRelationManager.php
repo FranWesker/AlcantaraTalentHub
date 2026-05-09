@@ -2,22 +2,12 @@
 
 namespace App\Filament\Resources\CompanyResource\RelationManagers;
 
-use Filament\Actions\AssociateAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\CreateAction;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\DissociateAction;
-use Filament\Actions\DissociateBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\Toggle;
+use Filament\Forms;
+use Filament\Schemas\Schema; // Volvemos a usar Schema aquí también
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Schemas\Schema;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Columns\TextColumn;
+use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class PublishedProjectsRelationManager extends RelationManager
 {
@@ -25,11 +15,6 @@ class PublishedProjectsRelationManager extends RelationManager
 
     protected static ?string $title = 'Proyectos Publicados';
 
-    /**
-     * Formulario para crear y editar proyectos
-     * @param Schema $schema
-     * @return Schema
-     */
     public function form(Schema $schema): Schema
     {
         return $schema
@@ -44,10 +29,9 @@ class PublishedProjectsRelationManager extends RelationManager
                     ->required()
                     ->rows(3),
 
-                // Aquí gestionamos los alumnos inscritos
                 Forms\Components\Select::make('applicants')
                     ->label('Alumnos Inscritos')
-                    ->multiple() // Permite ver y eliminar varios alumnos
+                    ->multiple()
                     ->relationship(
                         'applicants',
                         'name',
@@ -70,9 +54,8 @@ class PublishedProjectsRelationManager extends RelationManager
 
                 Tables\Columns\TextColumn::make('description')
                     ->label('Descripción')
-                    ->limit(50), // Muestra solo el inicio para no saturar la tabla
+                    ->limit(50),
 
-                // Columna para ver cuántos alumnos hay inscritos de un vistazo
                 Tables\Columns\TextColumn::make('applicants_count')
                     ->label('Alumnos')
                     ->counts('applicants')
