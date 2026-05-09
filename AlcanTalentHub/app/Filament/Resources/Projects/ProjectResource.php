@@ -16,8 +16,12 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables;
 
 class ProjectResource extends Resource
 {
@@ -33,7 +37,7 @@ class ProjectResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 // Aquí irían los campos para crear/editar un proyecto
             ]);
@@ -66,7 +70,7 @@ class ProjectResource extends Resource
                     ->boolean(), // Muestra un check verde o una X roja
 
                 // 4. Nombre de la empresa dueña
-                TextColumn::make('user.name') // Si la relación se llama 'company', cambia 'user.name' por 'company.name'
+                TextColumn::make('company.name') // Si la relación se llama 'company', cambia 'user.name' por 'company.name'
                     ->label('Empresa')
                     ->searchable()
                     ->sortable(),
@@ -81,7 +85,7 @@ class ProjectResource extends Resource
                 // Aquí podrías añadir filtros en el futuro
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                ViewAction::make(),
                 EditAction::make(),
             ])
             ->bulkActions([
