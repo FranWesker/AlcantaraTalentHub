@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources\Companies;
 
-use App\Filament\Resources\CompanyResource\RelationManagers\PublishedProjectsRelationManager;
+use App\Filament\Resources\Companies\RelationManagers\PublishedProjectsRelationManager;
 use App\Filament\Resources\Companies\Pages\CreateCompany;
 use App\Filament\Resources\Companies\Pages\EditCompany;
 use App\Filament\Resources\Companies\Pages\ListCompanies;
@@ -11,7 +11,7 @@ use App\Filament\Resources\Companies\Schemas\CompanyInfolist;
 use App\Models\User;
 use BackedEnum;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema; // Volvemos a usar Schema
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Filament\Forms;
 use Filament\Tables;

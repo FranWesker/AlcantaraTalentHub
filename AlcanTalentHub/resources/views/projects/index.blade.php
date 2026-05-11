@@ -18,7 +18,7 @@
                     <div class="mb-4">
                         <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Filtros rápidos por tecnología:</p>
                         <div id="filterButtonsContainer" class="flex flex-wrap gap-2">
-                            @foreach(['PHP', 'JavaScript', 'Java','HTML', 'Python', 'Diseño'] as $tech)
+                            @foreach(['PHP', 'JavaScript', 'Java','HTML', 'Python', 'Diseño','C#'] as $tech)
                                 <button
                                     type="button"
                                     class="filter-btn px-4 py-2 rounded-full border border-indigo-600 text-indigo-600 dark:text-indigo-400 dark:border-indigo-400 hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-400 dark:hover:text-gray-900 transition-all duration-200 text-xs font-bold uppercase tracking-wider"
