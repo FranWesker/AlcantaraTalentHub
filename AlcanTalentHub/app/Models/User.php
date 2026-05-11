@@ -7,8 +7,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Models\Project;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
@@ -48,6 +50,15 @@ class User extends Authenticatable
             'password' => 'hashed',
             'is_validated' => 'boolean',
         ];
+    }
+    /**
+     * Este es el método que comprueba si puede entrar a Filament
+     * @param Panel $panel
+     * @return bool
+     */
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return $this->role === 'admin';
     }
 
     // Relacion: Un estudiante tiene un perfil
@@ -94,13 +105,6 @@ class User extends Authenticatable
     {
         // Esto asume que en tu tabla 'projects' hay una columna llamada 'user_id'
         return $this->hasMany(Project::class);
-
-        /*
-         * Nota importante:
-         * Si al crear la tabla 'projects' llamaste a la clave foránea de otra manera
-         * (por ejemplo, 'company_id'), debes indicarlo en el segundo parámetro así:
-         * return $this->hasMany(Project::class, 'company_id');
-         */
     }
 
     public function isAdmin(): bool
