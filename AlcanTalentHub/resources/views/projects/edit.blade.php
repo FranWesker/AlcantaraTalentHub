@@ -1,44 +1,69 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Editar Proyecto:') }} {{ $project->title }}
-        </h2>
+        {{ __('Editar Proyecto: ') }} {{ $project->title }}
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
+    <div class="py-10">
+        {{-- Contenedor max-w-4xl para que el formulario no se estire demasiado en pantallas grandes --}}
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 sm:p-10 transition-all hover:shadow-md">
 
                 <form method="POST" action="{{ route('projects.update', $project) }}">
                     @csrf
                     @method('PATCH')
 
-                    <div>
-                        <x-input-label for="title" :value="__('Título del Proyecto')" />
-                        <x-text-input id="title" class="block mt-1 w-full" type="text" name="title" :value="old('title', $project->title)" required autofocus />
+                    <div class="mb-6">
+                        <label for="title" class="block text-sm font-bold text-gray-900 mb-2 uppercase tracking-wider">
+                            {{ __('Título del Proyecto') }}
+                        </label>
+                        <input
+                            id="title"
+                            type="text"
+                            name="title"
+                            value="{{ old('title', $project->title) }}"
+                            required
+                            autofocus
+                            class="block w-full border border-gray-300 rounded-xl shadow-sm py-3 px-4 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition-all sm:text-sm"
+                        />
                         <x-input-error :messages="$errors->get('title')" class="mt-2" />
                     </div>
 
-                    <div class="mt-4">
-                        <x-input-label for="description" :value="__('Descripción detallada')" />
-                        <textarea id="description" name="description" rows="5" class="block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm" required>{{ old('description', $project->description) }}</textarea>
+                    <div class="mb-6">
+                        <label for="description" class="block text-sm font-bold text-gray-900 mb-2 uppercase tracking-wider">
+                            {{ __('Descripción detallada') }}
+                        </label>
+                        <textarea
+                            id="description"
+                            name="description"
+                            rows="6"
+                            required
+                            class="block w-full border border-gray-300 rounded-xl shadow-sm py-3 px-4 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition-all sm:text-sm"
+                        >{{ old('description', $project->description) }}</textarea>
                         <x-input-error :messages="$errors->get('description')" class="mt-2" />
                     </div>
 
-                    <div class="block mt-4">
-                        <label for="is_active" class="inline-flex items-center">
-                            <input id="is_active" type="checkbox" class="rounded dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800" name="is_active" {{ $project->is_active ? 'checked' : '' }}>
-                            <span class="ms-2 text-sm text-gray-600 dark:text-gray-400">{{ __('Proyecto Abierto (visible para estudiantes)') }}</span>
+                    <div class="mb-8 bg-gray-50 p-4 rounded-xl border border-gray-100">
+                        <label for="is_active" class="inline-flex items-center cursor-pointer">
+                            <input
+                                id="is_active"
+                                type="checkbox"
+                                name="is_active"
+                                class="rounded border-gray-300 text-emerald-600 shadow-sm focus:ring-emerald-500 w-5 h-5 transition-all cursor-pointer"
+                                {{ $project->is_active ? 'checked' : '' }}
+                            >
+                            <span class="ms-3 text-sm font-semibold text-gray-700">
+                                {{ __('Proyecto Abierto (visible para estudiantes)') }}
+                            </span>
                         </label>
                     </div>
 
-                    <div class="flex items-center justify-end mt-4">
-                        <a href="{{ route('dashboard') }}" class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800 mr-4">
+                    <div class="flex items-center justify-end pt-6 border-t border-gray-100 gap-4">
+                        <a href="{{ route('dashboard') }}" class="text-sm font-semibold text-gray-500 hover:text-gray-800 transition-colors">
                             Cancelar
                         </a>
-                        <x-primary-button>
+                        <button type="submit" class="inline-flex justify-center items-center px-6 py-2.5 border border-transparent text-sm font-semibold rounded-lg text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-600 shadow-sm transition-all">
                             {{ __('Guardar Cambios') }}
-                        </x-primary-button>
+                        </button>
                     </div>
                 </form>
 

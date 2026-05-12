@@ -28,7 +28,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     //! El search va primero para que no entre en conflicto con el show de proyectos, si ponemos el show antes, al intentar acceder a /projects/search, Laravel pensará que "search" es un ID de proyecto y lanzará un error 404.
     Route::get('/projects/search', [ProjectController::class, 'search'])->name('projects.search');
     Route::get('/proyectos', [ProjectController::class, 'index'])->name('projects.index');
-    Route::get('/projects/{project}', [ProjectController::class, 'show'])->name('projects.show');
 
     //* RUTAS EXCLUSIVAS PARA EMPRESAS Y ADMIN
     Route::middleware('can:manage-company-features')->group(function () {
@@ -66,6 +65,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Postulación a proyectos
         Route::post('/projects/{project}/apply', [ApplicationController::class, 'store'])->name('applications.store');
     });
+
+    // La ruta 'show' ({project}) DEBE ir al final para que no intercepte rutas estáticas como /projects/create
+    Route::get('/projects/{project}', [ProjectController::class, 'show'])->name('projects.show');
 
 });
 

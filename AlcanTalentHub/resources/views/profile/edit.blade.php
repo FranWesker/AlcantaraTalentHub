@@ -1,38 +1,42 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Profile') }}
-        </h2>
+        {{ __('Profile') }}
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
+    <div class="py-10">
+        {{-- Limitamos a max-w-4xl para que los formularios del perfil no queden excesivamente anchos --}}
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+
+            {{-- Actualizar Información del Perfil --}}
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 sm:p-10 transition-all hover:shadow-md">
+                <div class="max-w-2xl">
                     @include('profile.partials.update-profile-information-form')
                 </div>
             </div>
 
-            {{-- Gestion del CV solamente visible para Estudiantes --}}
+            {{-- Gestión del CV (Solamente visible para Estudiantes) --}}
             @if (auth()->user()->isStudent())
-                <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                    <div class="max-w-xl">
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 sm:p-10 transition-all hover:shadow-md">
+                    <div class="max-w-2xl">
                         @include('profile.partials.manage-cv-form')
                     </div>
                 </div>
             @endif
 
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
+            {{-- Actualizar Contraseña --}}
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 sm:p-10 transition-all hover:shadow-md">
+                <div class="max-w-2xl">
                     @include('profile.partials.update-password-form')
                 </div>
             </div>
 
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
+            {{-- Eliminar Cuenta (Zona de Peligro) --}}
+            <div class="bg-white rounded-2xl shadow-sm border border-red-100 p-8 sm:p-10 transition-all hover:shadow-md">
+                <div class="max-w-2xl">
                     @include('profile.partials.delete-user-form')
                 </div>
             </div>
+
         </div>
     </div>
 </x-app-layout>
