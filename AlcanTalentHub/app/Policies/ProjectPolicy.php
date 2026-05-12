@@ -66,7 +66,7 @@ class ProjectPolicy
     public function update(User $user, Project $project): bool
     {
         // Puede editar si es ADMIN o si es la EMPRESA dueña del proyecto
-        return $user->isAdmin() || $user->id === $project->company_id;
+        return $user->isAdmin() || ($user->isCompany() && $user->id === $project->company_id);
     }
 
     /**

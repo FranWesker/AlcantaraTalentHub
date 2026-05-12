@@ -98,15 +98,6 @@ class User extends Authenticatable implements FilamentUser
         return $this->role === 'empresa';
     }
 
-    /**
-     * Relación: Una empresa (User) tiene muchos Proyectos.
-     */
-    public function projects()
-    {
-        // Esto asume que en tu tabla 'projects' hay una columna llamada 'user_id'
-        return $this->hasMany(Project::class);
-    }
-
     public function isAdmin(): bool
     {
         // Ajusta 'role' y 'admin' según cómo tengas configurada tu tabla de usuarios
