@@ -25,5 +25,8 @@ class DatabaseSeeder extends Seeder
             'is_validated' => true, // Lo marcamos como validado
             'password' => Hash::make('12345678'),
         ]);
+
+        //* Llamamos al seeder de datos iniciales
+        $this->call([InitialDataSeeder::class]);
     }
 }
