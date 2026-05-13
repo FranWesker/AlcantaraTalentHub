@@ -17,13 +17,13 @@
                 <div class="mb-6">
                     <p class="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wider">Filtros rápidos por tecnología:</p>
                     <div id="filterButtonsContainer" class="flex flex-wrap gap-2">
-                        @foreach(['PHP', 'JavaScript', 'Java','HTML', 'Python', 'Diseño','C#'] as $tech)
+                        @foreach($skills as $skill)
                             <button
                                 type="button"
                                 class="filter-btn px-4 py-2 rounded-lg border border-gray-200 bg-white text-gray-700 hover:border-blue-600 hover:text-blue-700 transition-all duration-200 text-xs font-bold uppercase tracking-wider shadow-sm"
-                                data-value="{{ $tech }}"
+                                data-value="{{ $skill->name }}"
                             >
-                                {{ $tech }}
+                                {{ $skill->name }}
                             </button>
                         @endforeach
                     </div>

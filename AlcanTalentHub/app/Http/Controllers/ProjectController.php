@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use App\Models\Skill;
 
 class ProjectController extends Controller
 {
@@ -36,9 +37,6 @@ class ProjectController extends Controller
     }
 
     /**
-     * Muestra el formulario para editar el proyecto
-     * @param Project $project
-     * @return \Illuminate\Contracts\View\View
      */
     public function edit(Project $project){
         // Verificamos que el proyecto pertenece a la empresa autenticada
@@ -110,7 +108,10 @@ class ProjectController extends Controller
 
         $projects = $projectsQuery->latest()->paginate(10);
 
-        return view('projects.index', compact('projects'));
+        // Obtenemos todas las skills para mostrarlas en el filtro ordenadas alfabeticamente
+        $skills = Skill::orderBy('name', 'asc')->get();
+
+        return view('projects.index', compact('projects', 'skills'));
     }
 
     /**
@@ -203,6 +204,9 @@ class ProjectController extends Controller
         $projects = Project::with('company')
             ->where('title', 'LIKE', '%' . $searchTerm . '%')
             ->orWhere('description', 'LIKE', '%' . $searchTerm . '%')
+            ->orWhereHas('company', function ($q) use ($searchTerm) {
+                $q->where('name', 'LIKE', '%' . $searchTerm . '%');
+            })
             ->latest() // Ordenamos por los más recientes
             ->get();
 
