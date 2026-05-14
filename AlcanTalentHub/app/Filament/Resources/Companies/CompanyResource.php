@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Filament\Actions\EditAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
+use Illuminate\Support\Facades\Hash;
 
 class CompanyResource extends Resource
 {
@@ -46,6 +47,20 @@ class CompanyResource extends Resource
                     ->label('Correo Electrónico')
                     ->email()
                     ->required(),
+
+                Forms\Components\TextInput::make('password')
+                    ->label('Contraseña')
+                    ->password()
+                    ->revealable()
+                    // Encripta la contraseña antes de guardarla
+                    ->dehydrateStateUsing(fn ($state) => Hash::make($state))
+                    // Solo envía el campo al modelo si tiene contenido (evita borrar la actual si se deja vacío)
+                    ->dehydrated(fn (?string $state): bool => filled($state))
+                    // Obligatorio solo al crear una empresa nueva
+                    ->required(fn (string $context): bool => $context === 'create')
+                    ->placeholder(fn (string $context): string =>
+                        $context === 'edit' ? 'Dejar en blanco para mantener la actual' : ''
+                    ),
             ]);
     }
 

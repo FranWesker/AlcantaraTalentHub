@@ -7,7 +7,8 @@ use Filament\Schemas\Schema;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\Projects\ProjectResource;
+use App\Models\Project;
 
 class PublishedProjectsRelationManager extends RelationManager
 {
@@ -29,16 +30,9 @@ class PublishedProjectsRelationManager extends RelationManager
                     ->required()
                     ->rows(3),
 
-                Forms\Components\Select::make('applicants')
-                    ->label('Alumnos Inscritos')
-                    ->multiple()
-                    ->relationship(
-                        'applicants',
-                        'name',
-                        fn (Builder $query) => $query->where('role', 'estudiante')
-                    )
-                    ->preload()
-                    ->helperText('Añade o quita alumnos de la lista para gestionar la inscripción.'),
+                Forms\Components\Toggle::make('is_active')
+                    ->label('Proyecto Activo')
+                    ->default(true),
             ]);
     }
 
@@ -54,30 +48,19 @@ class PublishedProjectsRelationManager extends RelationManager
 
                 Tables\Columns\TextColumn::make('description')
                     ->label('Descripción')
-                    ->limit(50),
-
-                Tables\Columns\TextColumn::make('applicants_count')
-                    ->label('Alumnos')
-                    ->counts('applicants')
-                    ->badge()
-                    ->color('info'),
+                    ->limit(50), // Muestra solo una breve parte de la descripción
             ])
             ->filters([
                 //
             ])
             ->headerActions([
-                \Filament\Actions\CreateAction::make()
-                    ->label('Nuevo Proyecto'),
+                // Eliminado CreateAction para evitar el error y forzar solo lectura
             ])
             ->actions([
-                \Filament\Actions\EditAction::make()
-                    ->label('Gestionar'),
-                \Filament\Actions\DeleteAction::make(),
+                // Eliminadas acciones de edición y borrado
             ])
             ->bulkActions([
-                \Filament\Actions\BulkActionGroup::make([
-                    \Filament\Actions\DeleteBulkAction::make(),
-                ]),
+                // Eliminadas acciones masivas
             ]);
     }
 }
