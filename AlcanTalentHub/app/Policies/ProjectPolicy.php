@@ -93,4 +93,16 @@ class ProjectPolicy
     {
         return false;
     }
+
+    /**
+     * Determina si el usuario puede ver los postulantes de un proyecto.
+     * @param User $user
+     * @param Project $project
+     * @return bool
+     */
+    public function viewApplicants(User $user, Project $project): bool
+    {
+        // Solo el administrador o la empresa dueña pueden ver a los postulantes
+        return $user->isAdmin() || ($user->isCompany() && $user->id === $project->company_id);
+    }
 }

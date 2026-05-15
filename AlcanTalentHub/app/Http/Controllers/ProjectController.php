@@ -39,10 +39,8 @@ class ProjectController extends Controller
     /**
      */
     public function edit(Project $project){
-        // Verificamos que el proyecto pertenece a la empresa autenticada
-        if ($project->company_id !== auth()->id()) {
-            abort(403, 'No tienes permiso para editar este proyecto.');
-        }
+        // Usamos la policy 'update' porque editar y actualizar requieren el mismo permiso
+        Gate::authorize('update', $project);
 
         return view('projects.edit', compact('project'));
     }
@@ -54,10 +52,8 @@ class ProjectController extends Controller
      * @return \Illuminate\Http\RedirectResponse
      */
     public function update(Request $request, Project $project){
-        // Verificamos que el proyecto pertenece a la empresa autenticada
-        if ($project->company_id !== auth()->id()) {
-            abort(403, 'No tienes permiso para actualizar este proyecto.');
-        }
+        // Autorización automática
+        Gate::authorize('update', $project);
 
         $request->validate([
             'title' => ['required', 'string', 'max:255'],
@@ -67,8 +63,7 @@ class ProjectController extends Controller
         $project->update([
             'title' => $request->title,
             'description' => $request->description,
-            // $request->has() devuelve true si el checkbox está marcado, false si no
-            'is_active' => $request->has('is_active'),
+            'is_active' => $request->boolean('is_active'), // <-- Aprovechamos para meter la mejora del booleano
         ]);
 
         return redirect()->route('dashboard')->with('status', '¡Proyecto actualizado con éxito!');
@@ -79,10 +74,8 @@ class ProjectController extends Controller
      * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy(Project $project){
-        // Verificamos que el proyecto pertenece a la empresa autenticada
-        if ($project->company_id !== auth()->id()) {
-            abort(403, 'No tienes permiso para eliminar este proyecto.');
-        }
+        // Llama al método 'delete' de ProjectPolicy
+        Gate::authorize('delete', $project);
 
         $project->delete();
 
@@ -114,25 +107,6 @@ class ProjectController extends Controller
         return view('projects.index', compact('projects', 'skills'));
     }
 
-    /**
-     * Verifica si el usuario que esta postulando a un proyecto tiene CV o no
-     * @param Project $project
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function apply(Project $project)
-    {
-        $user = auth()->user();
-
-        $profile = $user->profile;
-
-        // Validamos si es un estudiante y si tiene el CV subido
-        if (!$profile || empty($profile->cv_pdf_path)) {
-            // Bloqueamos la acción y redirigimos con un Flash Message de error
-            return redirect()->back()->with('error', 'Debes subir tu CV en tu perfil antes de poder postularte a un proyecto.');
-        }
-
-        return redirect()->route('projects.index')->with('success', '¡Te has postulado al proyecto con éxito!');
-    }
     /**
      * Summary of show
      * @param Project $project
@@ -171,12 +145,9 @@ class ProjectController extends Controller
      * @return \Illuminate\Contracts\View\View
      */
     public function applicants(Project $project){
-        // Seguridad: Verificar que el proyecto pertenece a la empresa autenticada
-        if ($project->company_id !== auth()->id()) {
-            abort(403, 'No tienes permiso para ver los postulantes de este proyecto.');
-        }
+        // Usamos el nuevo método que creamos en el Paso 1
+        Gate::authorize('viewApplicants', $project);
 
-        // Recuperamos los postulantes, pero FILTRAMOS para que no traiga a los 'rejected'
         $applicants = $project->applicants()
                           ->wherePivot('status', '!=', 'rejected')
                           ->with(['profile', 'skills'])

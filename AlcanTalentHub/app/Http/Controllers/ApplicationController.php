@@ -7,6 +7,7 @@ use App\Models\Project;
 use App\Models\User;
 use App\Notifications\StudentAppliedToProject;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class ApplicationController extends Controller
 {
@@ -66,16 +67,13 @@ class ApplicationController extends Controller
      */
     public function updateStatus(Request $request, Project $project, $student_id)
     {
-        // Seguridad: Verificar que el proyecto pertenece a la empresa autenticada
-        if ($project->company_id !== auth()->id()) {
-            abort(403, 'No tienes permiso sobre este proyecto.');
-        }
+        // Autorizamos usando la política 'update' del proyecto
+        Gate::authorize('update', $project);
 
         $request->validate([
             'status' => 'required|in:accepted,rejected'
         ]);
 
-        // Actualizamos la tabla pivote usando updateExistingPivot
         $project->applicants()->updateExistingPivot($student_id, [
             'status' => $request->status
         ]);
@@ -91,10 +89,9 @@ class ApplicationController extends Controller
      */
     public function accept(Project $project, User $student)
     {
-        // Autorización: Asegurar que solo el dueño del proyecto pueda aceptar
-        abort_if(auth()->id() !== $project->company_id, 403, 'No estás autorizado para realizar esta acción.');
+        // Autorizamos usando la política 'update' del proyecto
+        Gate::authorize('update', $project);
 
-        // Actualizar el estado en la tabla pivote a 'accepted'
         $project->applicants()->updateExistingPivot($student->id, ['status' => 'accepted']);
 
         return back()->with('success', 'Estudiante aceptado exitosamente.');

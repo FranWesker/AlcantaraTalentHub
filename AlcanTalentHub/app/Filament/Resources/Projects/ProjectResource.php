@@ -21,6 +21,7 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
+use Illuminate\Database\Eloquent\Builder;
 
 class ProjectResource extends Resource
 {
@@ -54,6 +55,18 @@ class ProjectResource extends Resource
                     ])
                     ->required()
                     ->native(false),
+
+                Select::make('company_id')
+                    ->label('Empresa Responsable')
+                    ->relationship(
+                        name: 'company',
+                        titleAttribute: 'name',
+                        modifyQueryUsing: fn (Builder $query) => $query->where('role', 'empresa')
+                    )
+                    ->searchable()
+                    ->preload()
+                    ->required()
+                    ->helperText('Selecciona la empresa a la que pertenece este proyecto.'),
             ]);
     }
 

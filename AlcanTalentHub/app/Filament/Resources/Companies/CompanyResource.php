@@ -43,24 +43,30 @@ class CompanyResource extends Resource
                     ->label('Nombre de la Empresa')
                     ->required()
                     ->maxLength(255),
+
                 Forms\Components\TextInput::make('email')
                     ->label('Correo Electrónico')
                     ->email()
-                    ->required(),
+                    ->required()
+                    ->maxLength(255)
+                    // Añadimos unique() apuntando a la tabla 'users'
+                    // ignoreRecord: true es vital para que al editar no dé falso positivo
+                    ->unique(table: 'users', column: 'email', ignoreRecord: true),
 
                 Forms\Components\TextInput::make('password')
                     ->label('Contraseña')
                     ->password()
                     ->revealable()
-                    // Encripta la contraseña antes de guardarla
                     ->dehydrateStateUsing(fn ($state) => Hash::make($state))
-                    // Solo envía el campo al modelo si tiene contenido (evita borrar la actual si se deja vacío)
                     ->dehydrated(fn (?string $state): bool => filled($state))
-                    // Obligatorio solo al crear una empresa nueva
                     ->required(fn (string $context): bool => $context === 'create')
                     ->placeholder(fn (string $context): string =>
                         $context === 'edit' ? 'Dejar en blanco para mantener la actual' : ''
                     ),
+
+                // Añadimos un campo oculto para forzar que el rol sea "empresa" al crear
+                Forms\Components\Hidden::make('role')
+                    ->default('empresa'),
             ]);
     }
 

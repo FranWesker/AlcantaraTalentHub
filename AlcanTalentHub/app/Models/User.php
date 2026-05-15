@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -69,7 +68,7 @@ class User extends Authenticatable implements FilamentUser
 
     // Relacion: Un estudiante tiene muchas habilidades
     public function skills(){
-        return $this->belongsToMany(Skill::class,);
+        return $this->belongsToMany(Skill::class);
     }
 
     //Relacion: Una empresa publica muchos proyectos
