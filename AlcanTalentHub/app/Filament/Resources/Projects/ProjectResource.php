@@ -9,18 +9,18 @@ use App\Filament\Resources\Projects\Pages\ViewProject;
 use App\Filament\Resources\Projects\RelationManagers\ApplicationsRelationManager;
 use App\Filament\Resources\Projects\Schemas\ProjectInfolist;
 use App\Models\Project;
-use Filament\Forms\Components\RichEditor;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Tables\Table;
-use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\IconColumn;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
 class ProjectResource extends Resource
@@ -42,9 +42,10 @@ class ProjectResource extends Resource
                     ->maxLength(255)
                     ->columnSpanFull(),
 
-                RichEditor::make('description')
+                Textarea::make('description')
                     ->label('Descripción del Proyecto')
                     ->required()
+                    ->rows(6) // Opcional: hace que la caja de texto sea más grande
                     ->columnSpanFull(),
 
                 Select::make('is_active')
@@ -79,16 +80,32 @@ class ProjectResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('title')->label('Nombre del Proyecto')->searchable()->sortable(),
-                TextColumn::make('description')->label('Descripción')->limit(50)->searchable(),
-                IconColumn::make('is_active')->label('¿Activo?')->boolean(),
-                TextColumn::make('company.name')->label('Empresa')->searchable()->sortable(),
-                TextColumn::make('applications_count')->counts('applications')->label('Nº Alumnos Postulados')->sortable(),
+                TextColumn::make('title')
+                    ->label('Nombre del Proyecto')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('description')
+                    ->label('Descripción')
+                    ->html()
+                    ->limit(50)
+                    ->searchable(),
+                IconColumn::make('is_active')
+                    ->label('¿Activo?')
+                    ->boolean(),
+                TextColumn::make('company.name')
+                    ->label('Empresa')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('applications_count')
+                    ->counts('applications')
+                    ->label('Nº Alumnos Postulados')
+                    ->sortable(),
             ])
             ->filters([])
             ->actions([
                 ViewAction::make(),
-                EditAction::make(),
+                EditAction::make()
+                    ->labeledFrom('Editar'),
             ])
             ->bulkActions([
                 BulkActionGroup::make([

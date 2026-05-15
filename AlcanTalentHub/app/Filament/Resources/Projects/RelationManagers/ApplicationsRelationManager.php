@@ -3,15 +3,16 @@
 namespace App\Filament\Resources\Projects\RelationManagers;
 
 use App\Models\Application;
+use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Filament\Actions\Action;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
+
 
 class ApplicationsRelationManager extends RelationManager
 {
@@ -32,8 +33,13 @@ class ApplicationsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('id')
             ->columns([
-                TextColumn::make('student.name')->label('Nombre del Alumno')->searchable()->sortable(),
-                TextColumn::make('student.email')->label('Email')->searchable(),
+                TextColumn::make('student.name')
+                    ->label('Nombre del Alumno')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('student.email')
+                    ->label('Email')
+                    ->searchable(),
                 TextColumn::make('status')
                     ->label('Estado')
                     ->badge()
@@ -79,7 +85,10 @@ class ApplicationsRelationManager extends RelationManager
             ])
             ->bulkActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()
+                        ->label('Eliminar Postulaciones')
+                        ->requiresConfirmation()
+                        ->color('danger'),
                 ]),
             ]);
     }

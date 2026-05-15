@@ -82,7 +82,7 @@
                         <div class="block px-4 py-2 text-xs text-gray-400 font-semibold uppercase tracking-widest">Gestionar Cuenta</div>
 
                         <x-dropdown-link :href="route('profile.edit')">
-                            {{ __('Profile') }}
+                            {{ __('Perfil') }}
                         </x-dropdown-link>
 
                         <form method="POST" action="{{ route('logout') }}">
@@ -91,7 +91,7 @@
                             <x-dropdown-link :href="route('logout')"
                                     onclick="event.preventDefault();
                                                 this.closest('form').submit();" class="text-red-600 hover:text-red-800">
-                                {{ __('Log Out') }}
+                                {{ __('Cerrar Sesión') }}
                             </x-dropdown-link>
                         </form>
                     </x-slot>
@@ -156,7 +156,7 @@
 
                 <div class="pt-2">
                     <x-responsive-nav-link :href="route('profile.edit')">
-                        {{ __('Profile') }}
+                        {{ __('Perfil') }}
                     </x-responsive-nav-link>
 
                     <form method="POST" action="{{ route('logout') }}">
@@ -165,7 +165,7 @@
                         <x-responsive-nav-link :href="route('logout')"
                                 onclick="event.preventDefault();
                                             this.closest('form').submit();" class="text-red-600 font-semibold hover:bg-red-50">
-                            {{ __('Log Out') }}
+                            {{ __('Cerrar Sesión') }}
                         </x-responsive-nav-link>
                     </form>
                 </div>

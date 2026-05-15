@@ -94,7 +94,6 @@ class ProjectController extends Controller
         $projectsQuery = Project::with('company')
             ->where('is_active', true); // Solo mostramos proyectos activos
 
-        // Corregido: Usamos el método isStudent() del modelo User
         if ($user && $user->isStudent()) {
              $projectsQuery->hideRejectedForStudent($user);
         }
@@ -165,21 +164,35 @@ class ProjectController extends Controller
         // Obtenemos el texto que el usuario escribió en el input (query)
         $searchTerm = $request->input('query');
 
-        // Si la búsqueda está vacía, podemos devolver un arreglo vacío
+        // Si la búsqueda está vacía, devolvemos un arreglo vacío rápidamente
         if (empty($searchTerm)) {
             return response()->json([]);
         }
 
-        // Realizamos la consulta a la base de datos
-        // Usamos 'with('company')' para traer la información de la empresa y evitar errores en JavaScript
-        $projects = Project::with('company')
-            ->where('title', 'LIKE', '%' . $searchTerm . '%')
-            ->orWhere('description', 'LIKE', '%' . $searchTerm . '%')
-            ->orWhereHas('company', function ($q) use ($searchTerm) {
-                $q->where('name', 'LIKE', '%' . $searchTerm . '%');
-            })
-            ->latest() // Ordenamos por los más recientes
-            ->get();
+        // Obtenemos al usuario autenticado para saber si es un estudiante
+        $user = $request->user();
+
+        // Construimos la consulta base
+        $projectsQuery = Project::with('company')
+            ->where('is_active', true) // Primera regla obligatoria: que esté activo
+            ->where(function ($query) use ($searchTerm) {
+                // Envolvemos los OR en este bloque
+                // Así nos aseguramos de que no anulen el "is_active" o el filtro de rechazados
+                $query->where('title', 'LIKE', '%' . $searchTerm . '%')
+                      ->orWhere('description', 'LIKE', '%' . $searchTerm . '%')
+                      ->orWhereHas('company', function ($q) use ($searchTerm) {
+                          $q->where('name', 'LIKE', '%' . $searchTerm . '%');
+                      });
+            });
+
+        // Verificamos si hay un usuario logueado y si tiene el rol de estudiante
+        if ($user && $user->isStudent()) {
+            // Aplicamos el mismo filtro (scope) que usas en el index
+            $projectsQuery->hideRejectedForStudent($user);
+        }
+
+        // Ejecutamos la consulta, ordenamos por los más recientes y obtenemos los datos
+        $projects = $projectsQuery->latest()->get();
 
         // Devolvemos los datos en formato JSON para que Fetch API los pueda procesar
         return response()->json($projects);
