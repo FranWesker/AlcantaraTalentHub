@@ -33,7 +33,6 @@ class StudentProfile extends Model
             'skill_user', // Nombre de la tabla intermedia
             'user_id',    // Clave foránea en la tabla intermedia referenciando al estudiante/usuario
             'skill_id',   // Clave foránea en la tabla intermedia referenciando a la habilidad
-            'user_id',    // Clave local en la tabla student_profiles (asumiendo que tienes una columna user_id)
             'id'          // Clave local en la tabla skills
         );
     }

@@ -26,7 +26,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Búsqueda y visualización de proyectos
     //! El search va primero para que no entre en conflicto con el show de proyectos, si ponemos el show antes, al intentar acceder a /projects/search, Laravel pensará que "search" es un ID de proyecto y lanzará un error 404.
-    Route::get('/projects/search', [ProjectController::class, 'search'])->name('projects.search');
     Route::get('/proyectos', [ProjectController::class, 'index'])->name('projects.index');
 
     //* RUTAS EXCLUSIVAS PARA EMPRESAS Y ADMIN
