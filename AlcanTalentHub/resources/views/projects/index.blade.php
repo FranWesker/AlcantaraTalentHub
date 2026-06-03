@@ -117,7 +117,7 @@
                 // Ocultamos la paginación durante la búsqueda AJAX
                 if (paginationContainer) paginationContainer.style.display = 'none';
 
-                const urlBusqueda = `/api/projects/search?query=${encodeURIComponent(trimmedQuery)}`;
+                const urlBusqueda = `{{ route('projects.search') }}?query=${encodeURIComponent(trimmedQuery)}`;
 
                 fetch(urlBusqueda, {
                     method: 'GET',
@@ -194,7 +194,7 @@
             //Escritura en el input
             searchInput.addEventListener('keyup', () => {
                 performSearch(searchInput.value);
-                updateActiveButton('');
+                updateActiveButton(searchInput.value);
             });
 
             // Clic en botones de filtro
