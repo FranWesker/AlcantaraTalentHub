@@ -38,7 +38,7 @@ class ProjectPolicy
         // Si es un estudiante, comprobamos si tiene una solicitud rechazada para este proyecto
         if ($user->role === 'student') {
             $isRejected = $project->applications()
-                ->where('user_id', $user->id)
+                ->where('student_id', $user->id)
                 ->where('status', 'rejected')
                 ->exists();
 
