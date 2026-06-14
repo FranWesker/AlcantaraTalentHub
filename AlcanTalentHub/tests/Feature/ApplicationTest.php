@@ -30,7 +30,6 @@ test('un estudiante puede postularse exitosamente y dispara una notificación', 
     $project = Project::factory()->create(['company_id' => $company->id]);
     $student = User::factory()->create(['role' => 'estudiante']);
 
-    // Corregido: Insertamos usando Eloquent puro para saltarnos la factory inexistente
     StudentProfile::create([
         'user_id' => $student->id,
         'cv_pdf_path' => 'cvs/mi_curriculum.pdf'
@@ -51,7 +50,6 @@ test('un estudiante no puede postularse dos veces al mismo proyecto', function (
     $project = Project::factory()->create(['company_id' => $company->id]);
     $student = User::factory()->create(['role' => 'estudiante']);
 
-    // Corregido: Insertamos usando Eloquent puro
     StudentProfile::create([
         'user_id' => $student->id,
         'cv_pdf_path' => 'cvs/mi_curriculum.pdf'

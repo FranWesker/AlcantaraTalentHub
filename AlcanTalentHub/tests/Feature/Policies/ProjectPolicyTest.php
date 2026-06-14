@@ -17,11 +17,9 @@ test('el administrador tiene acceso total por el método before', function () {
 });
 
 test('un estudiante no puede ver un proyecto si su postulación fue rechazada', function () {
-   // 1. Guardamos como 'estudiante' para cumplir el CHECK de base de datos
     $student = User::factory()->create(['role' => 'estudiante']);
     $project = Project::factory()->create();
 
-    // 2. Insertamos la aplicación vinculándola mediante la relación hasMany o de applicants
     $project->applications()->create([
         'user_id' => $student->id,
         'student_id' => $student->id,
@@ -30,11 +28,8 @@ test('un estudiante no puede ver un proyecto si su postulación fue rechazada', 
 
     $project->refresh();
 
-    // 3. Modificamos el objeto únicamente EN MEMORIA antes de que pase por el Gate,
-    // de modo que ProjectPolicy.php encuentre el valor 'student' en su condicional.
     $student->role = 'student';
 
-    // Ahora la política procesará el rechazo correctamente y denegará la vista (false)
     expect($student->can('view', $project))->toBeFalse();
 });
 
